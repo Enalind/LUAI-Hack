@@ -1,0 +1,20 @@
+/* Palette supplied by the Asteria identity kit. Fonts are self-hosted with next/font/local. */
+:root {
+  --asteria-forest: #29463B;
+  --asteria-cream: #F5EFE3;
+  --asteria-stone: #E3DBCC;
+  --asteria-clay: #C28E76;
+  --asteria-olive: #A5AD94;
+  --asteria-ink: #30372F;
+  --asteria-muted: #596458;
+  --asteria-white: #FFFDF8;
+  --asteria-line: #CBC6B8;
+  --asteria-link: #395E4D;
+  --asteria-amber: #805224;
+  --asteria-amberbg: #F2E5CF;
+  --asteria-error: #913F35;
+  --asteria-errorbg: #F7E6DF;
+  --space-unit: 8px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+}

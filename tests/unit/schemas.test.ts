@@ -4,9 +4,9 @@ import {
   findingSchema, providerDraftOutputSchema, providerReviewOutputSchema, reviewDispositionSchema,
   reviewResultSchema, sourceInputSchema, sourceSnapshotSchema,
 } from "../../lib/schemas";
-import { developmentCases } from "../../fixtures/development/cases";
+import { emptySourceInput } from "../../lib/workspace-state";
 
-const source = developmentCases[1].input;
+const source = { ...emptySourceInput(), consultationText: "Patient: Jag har ont i nacken." };
 const decision = source.explicitDecision;
 const context = { requestId: "d3faee2b-b031-4c54-8bdc-d572a17d19b1", sourceRevision: 0, draftRevision: 2 };
 const metadata = { mode: "mock", modelId: "test-provider", promptVersion: "test-v1", latencyMs: 0, usage: null };

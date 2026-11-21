@@ -1,227 +1,31 @@
 {
   "id": "D2",
+  "title": "Nackvärk · långt telefonsamtal med kvarstående luckor",
+  "scenario": "Utförlig symtomanamnes och registrerad symtomdiagnos; yrke, arbetskrav, aktuell undersökning, behandlingsplan och sjukskrivningsbeslut saknas fortfarande.",
+  "consultationText": "[00:00] Läkare: Hej, jag ringer på den bokade telefontiden. Passar det att prata nu?\n[00:09] Patient: Ja, absolut. Jag fick stänga av köksfläkten bara. Nu hör jag dig bättre.\n[00:18] Läkare: Jag ser att det gäller nacken. Vad är det du framför allt vill ha hjälp med idag?\n[00:29] Patient: Jag har haft värk i nacken i två veckor. Det ger liksom inte med sig, och nu börjar jag bli trött på att vakna av det också.\n[00:45] Läkare: Minns du när du först lade märke till besvären?\n[00:52] Patient: Jag vaknade stel en morgon för ungefär två veckor sedan. Jag tänkte att jag legat konstigt. Det var inte efter någon olycka eller så, vad jag kan komma på.\n[01:09] Läkare: Har det kommit och gått sedan dess, eller finns det där hela tiden?\n[01:18] Patient: Lite hela tiden, men inte lika mycket. När jag är uppe och rör mig kan jag nästan glömma det, tills jag vrider huvudet hastigt. På kvällen märker jag det mer.\n[01:35] Läkare: Var sitter värken när du pekar på den?\n[01:42] Patient: Från nedanför hårfästet och en bit ner mot axlarna. Mest på höger sida, tror jag. Det är svårt att säga en enda punkt, hela området känns spänt.\n[01:58] Läkare: Känns det framför allt som värk, eller finns det stickningar eller domningar också?\n[02:07] Patient: Jag skulle säga värk och stelhet. Det sticker inte i fingrarna. Ibland känns det ner mot skulderbladet, men jag vet inte om det är samma sak eller om jag bara spänner mig.\n[02:25] Läkare: När du säger skulderbladet, menar du på samma sida som nackvärken?\n[02:33] Patient: Ja, höger. Fast det var mer förra veckan. Nu är det framför allt nacken när jag tittar åt sidan.\n[02:45] Läkare: Kan du beskriva vad som händer när du vrider huvudet utan att försöka pressa igenom smärtan?\n[02:56] Patient: Det tar emot och jag stannar. Jag kan titta åt båda hållen, men jag tar det långsamt och vrider nog med hela överkroppen ibland. Jag vet inte hur långt det är i grader.\n[03:15] Läkare: Det behöver du inte uppskatta. Det här är vad du upplever, inte en uppmätt rörlighet. Jag kan inte mäta eller undersöka den över telefon.\n[03:29] Patient: Nej, det förstår jag. Jag försökte förklara för sjuksköterskan också men jag tyckte det var svårt att beskriva.\n[03:41] Läkare: Har du haft feber eller känt dig sjuk på något annat sätt samtidigt?\n[03:50] Patient: Nej, inte vad jag har märkt. Jag har varit trött, men jag tror det är för att jag sovit dåligt. Jag har inte tagit temperaturen varje dag.\n[04:06] Läkare: Berätta lite mer om sömnen. Är det svårt att somna eller vaknar du under natten?\n[04:16] Patient: Jag sover sämre när det gör ont. Jag somnar oftast till slut, men när jag vänder mig vaknar jag till och får rätta till kudden. Vissa nätter är det tre, fyra gånger.\n[04:34] Läkare: Är det så varje natt eller har någon natt varit bättre?\n[04:42] Patient: Natten till igår var faktiskt bättre. Då hade jag varit ute och gått på eftermiddagen och satt inte med telefonen så länge på kvällen. Men jag vet inte om det var därför.\n[05:00] Läkare: Då antecknar jag variationen utan att säga säkert vad den beror på. Vad brukar annars lindra eller förvärra?\n[05:12] Patient: En varm dusch känns skönt just då. Om jag sitter still länge blir jag stelare. Jag har bytt kudde två gånger nu, men ingen av dem gör någon jätteskillnad.\n[05:29] Läkare: När du sitter still, är det exempelvis vid matbordet, i soffan eller på annat sätt?\n[05:39] Patient: Det kan vara när jag läser eller sitter i soffan och tittar på tv. Jag brukar märka det först när jag ska resa mig eller titta åt sidan. Jag har inte tagit tid på det.\n[05:59] Läkare: Har du prövat något annat för besvären?\n[06:05] Patient: Jag provade en tablett en kväll som fanns hemma. Jag vet inte vad den hette längre, min partner tog undan förpackningen. Jag vill helst inte gissa.\n[06:20] Läkare: Då dokumenterar vi det som en ospecificerad uppgift om egenbehandling. Det är inte samma sak som en pågående läkemedelsordination.\n[06:32] Patient: Nej. Jag tar inget varje dag. Det var mest för att kunna komma till ro den kvällen.\n[06:43] Läkare: Har du haft liknande nackbesvär tidigare?\n[06:49] Patient: Jag var stel någon gång efter en lång bilresa i somras, men det gick över på ett par dagar. Jag har aldrig fått någon utredning av nacken.\n[07:05] Läkare: Var det samma sida då?\n[07:11] Patient: Det minns jag faktiskt inte. Det var mer att jag var allmänt stel efter att ha suttit länge. Det här har hållit i sig längre.\n[07:26] Läkare: Finns det någon tidigare behandling som du fortfarande följer?\n[07:33] Patient: Nej, inget program eller några övningar från vården. Jag har sett lite på nätet men inte gjort något systematiskt.\n[07:45] Läkare: Har någon redan bedömt det här vid ett fysiskt besök?\n[07:53] Patient: Nej. Jag pratade med sjuksköterskan, sedan fick jag den här tiden. Jag har inte varit inne på mottagningen för det här.\n[08:06] Läkare: Då finns det alltså inga aktuella undersökningsfynd att återge i dagens underlag. Jag vill vara tydlig med skillnaden mellan det och vad du själv beskriver.\n[08:21] Patient: Ja. För mig är det mest att jag vill veta varför det inte släpper, men jag förstår att du behöver se hur det fungerar också.\n[08:36] Läkare: Har besvären förändrats tydligt de senaste dagarna, åt något håll?\n[08:44] Patient: Inte så mycket. Jag tycker att det går lite bättre på morgonen nu, men på kvällen känns det ungefär som förra veckan. Det är svårt att veta om jag gör för mycket eller bara är trött.\n[09:04] Läkare: Är det något som gör dig särskilt orolig?\n[09:11] Patient: Mest att det har hållit i sig. När jag söker på nätet hittar jag allt möjligt och då börjar jag tänka för mycket. Jag har inte någon bestämd sjukdom i tankarna.\n[09:29] Läkare: Jag kan dokumentera att du beskriver ihållande nackvärk och störd sömn. Utifrån det här samtalet har jag inte underlag för att tillskriva dig ett objektivt neurologiskt fynd.\n[09:45] Patient: Okej. Det är bra att det står vad vi faktiskt pratat om.\n[09:54] Läkare: Jag registrerar symtomdiagnosen cervikalgi, M54.2, för den här kontakten. Det innebär inte att vi därmed har gjort en fullständig undersökning eller bedömt arbetsförmågan.\n[10:08] Patient: Jag förstår. Jag hade också en fråga om ett intyg, men jag vet inte riktigt vad som behöver vara med.\n[10:21] Läkare: Då behöver underlaget kompletteras med bland annat konkreta arbetsuppgifter och min bedömning av begränsningar i förhållande till dem. Det ska inte fyllas i med gissningar.\n[10:36] Patient: Nej, det vill jag inte heller. Jag har inga papper framför mig just nu och vill att det ska bli rätt.\n[10:49] Läkare: Jag har ännu inte fattat något beslut om sjukskrivningsgrad eller period i den här kontakten. Vi lämnar de fälten tomma i det underlag som finns nu.\n[11:04] Patient: Bra, då vet jag att det inte redan är bestämt bara för att jag frågade.\n[11:14] Läkare: Är telefonnumret vi använder idag det bästa numret för fortsatt kontakt?\n[11:22] Patient: Ja, det här numret går bra. Om jag inte svarar direkt brukar jag kunna ringa upp när jag ser att ni har sökt mig.\n[11:36] Läkare: Tack. Är det något i beskrivningen av själva nackvärken och sömnen som du vill rätta?\n[11:46] Patient: Nej. Att det har varit ungefär två veckor och att det stör nätterna är det viktigaste. Jag kan inte säga något exakt datum när det började.\n[12:01] Läkare: Då antecknar jag ungefär två veckor och inte ett påhittat exakt debutdatum. Vi har inte gått igenom färdig behandlingsplan eller arbetsanamnes i den del av kontakten som dokumenterats här.\n[12:18] Patient: Okej. Tack för att du förklarar vad som är med och vad som inte är klart än.",
+  "clinicianAssessmentText": "",
+  "explicitDecision": {
+    "diagnosisText": "Cervikalgi",
+    "diagnosisCode": "M54.2",
+    "leaveExtent": null,
+    "startDate": null,
+    "endDate": null
+  },
+  "journalEntries": [
+    {
+      "id": "d2-journal-triage",
+      "date": "2026-11-18",
+      "title": "Bokningsanteckning · telefon · 18 november",
+      "text": "2026-11-18 kl. 13:40 · Telefon · Vårdcentralen Norrdal (fiktiv)\nKontaktorsak: Nackvärk och störd nattsömn.\nAktuellt: Värk sedan cirka två veckor enligt patienten. Ingen känd olycka. Önskar bedömning; har inte undersökts fysiskt för aktuell episod. Anamnesen är ofullständig.\nStatus: Ingen undersökning vid bokningskontakt.\nAdministration: Telefontid erbjuden 21 november. Yrke och arbetsuppgifter efterfrågas inte vid denna kontakt. Ingen behandling eller sjukskrivning beslutad."
+    },
+    {
+      "id": "d2-journal-current",
+      "date": "2026-11-21",
+      "title": "Kontaktanteckning · telefon · 21 november",
+      "text": "2026-11-21 kl. 11:05 · Telefon · Vårdcentralen Norrdal (fiktiv)\nAnamnes: Patienten uppger nackvärk i cirka två veckor, huvudsakligen höger sida, varierande över dygnet. Störd sömn när det gör ont. Anger stelhet efter stillasittande, utan uppmätt varaktighet eller rörelseomfång. Tidigare tillfällig stelhet efter bilresa är en separat, avslutad episod.\nLäkemedelsuppgift: Patienten minns enstaka ospecificerad receptfri tablett; preparat och dos okända. Detta är inte en verifierad aktuell ordination.\nUndersökningsunderlag: Ingen fysisk undersökning dokumenterad. Patientens beskrivning av att rörelse tar emot är inte en uppmätt funktionsnedsättning.\nRegistrerad diagnos: M54.2 Cervikalgi (ICD-10-SE 2026), symtomdiagnos vald av läkaren för kontakten.\nOfullständigt underlag: Arbetsanamnes, läkarens bedömning av aktivitetsbegränsningar i arbetet och färdig behandlingsplan saknas. Ingen omfattning eller period för sjukskrivning är beslutad i tillgänglig dokumentation."
+    }
+  ],
+  "fictional": true,
   "split": "development",
-  "title": "Axelsmärta – uppgifter om arbetet saknas",
-  "scenario": "Verkliga luckor. Varken samtalet eller journalen nämner patientens arbete, läkaren har inte skrivit någon bedömning av arbetsförmågan och sjukskrivningens omfattning och period är tomma. Appen ska ställa riktade frågor och får inte hitta på ett arbete, ett orsakssamband eller ett beslut.",
-  "sources": [
-    {
-      "id": "T1",
-      "type": "transcript",
-      "speaker": "Läkare",
-      "text": "Vad gäller besöket idag?"
-    },
-    {
-      "id": "T2",
-      "type": "transcript",
-      "speaker": "Patient",
-      "text": "Min högra axel. Den har gjort ont i ungefär sex veckor nu, och det blir värre."
-    },
-    {
-      "id": "T3",
-      "type": "transcript",
-      "speaker": "Läkare",
-      "text": "När gör det mest ont?"
-    },
-    {
-      "id": "T4",
-      "type": "transcript",
-      "speaker": "Patient",
-      "text": "När jag lyfter armen över huvudet. Och på natten om jag ligger på den sidan, då vaknar jag."
-    },
-    {
-      "id": "T5",
-      "type": "transcript",
-      "speaker": "Läkare",
-      "text": "Har du provat något mot det?"
-    },
-    {
-      "id": "T6",
-      "type": "transcript",
-      "speaker": "Patient",
-      "text": "Ipren ibland. Det tar udden av det, men det håller inte i sig."
-    },
-    {
-      "id": "T7",
-      "type": "transcript",
-      "speaker": "Läkare",
-      "text": "Några domningar eller stickningar ner i armen?"
-    },
-    {
-      "id": "T8",
-      "type": "transcript",
-      "speaker": "Patient",
-      "text": "Nej, inget sådant."
-    },
-    {
-      "id": "T9",
-      "type": "transcript",
-      "speaker": "Patient",
-      "text": "Ärligt talat är jag bara trött på det. Jag behöver ett intyg så att jag kan vara hemma ett tag."
-    },
-    {
-      "id": "J1",
-      "type": "journal",
-      "entry_id": "E1",
-      "date": "2026-10-12",
-      "author_role": "Fysioterapeut",
-      "heading": "Aktuellt",
-      "text": "Smärta i höger axel sedan cirka en vecka, värst vid lyft av armen över huvudet."
-    },
-    {
-      "id": "J2",
-      "type": "journal",
-      "entry_id": "E1",
-      "date": "2026-10-12",
-      "author_role": "Fysioterapeut",
-      "heading": "Status",
-      "text": "Smärtsam båge vid abduktion höger. Full passiv rörlighet."
-    },
-    {
-      "id": "J3",
-      "type": "journal",
-      "entry_id": "E1",
-      "date": "2026-10-12",
-      "author_role": "Fysioterapeut",
-      "heading": "Åtgärd",
-      "text": "Hemträningsprogram för axeln. Återbesök vid behov."
-    },
-    {
-      "id": "J4",
-      "type": "journal",
-      "entry_id": "E2",
-      "date": "2026-11-19",
-      "author_role": "Läkare",
-      "heading": "Anamnes",
-      "text": "Smärta i höger axel sedan cirka sex veckor, tilltagande. Värst vid rörelser över huvudet och nattetid vid liggande på höger sida. Tar Ipren vid behov med kortvarig effekt. Inga domningar eller stickningar i armen."
-    },
-    {
-      "id": "J5",
-      "type": "journal",
-      "entry_id": "E2",
-      "date": "2026-11-19",
-      "author_role": "Läkare",
-      "heading": "Status",
-      "text": "Smärtsam båge mellan 70 och 120 graders abduktion höger. Positivt Hawkins och Neer höger. Full passiv rörlighet. Normal kraft."
-    },
-    {
-      "id": "J6",
-      "type": "journal",
-      "entry_id": "E2",
-      "date": "2026-11-19",
-      "author_role": "Läkare",
-      "heading": "Bedömning",
-      "text": "Bilden talar för impingement i höger axel. Smärtrelaterat nedsatt förmåga att arbeta med höger arm över axelhöjd."
-    },
-    {
-      "id": "J7",
-      "type": "journal",
-      "entry_id": "E2",
-      "date": "2026-11-19",
-      "author_role": "Läkare",
-      "heading": "Åtgärd",
-      "text": "Fortsatt hemträning. Ipren vid behov."
-    }
-  ],
-  "journal_entries": [
-    {
-      "entry_id": "E1",
-      "date": "2026-10-12",
-      "contact_type": "Besök",
-      "care_unit": "Rehabmottagningen Söder",
-      "author_role": "Fysioterapeut",
-      "contact_reason": "Axelsmärta höger",
-      "note_ids": [
-        "J1",
-        "J2",
-        "J3"
-      ]
-    },
-    {
-      "entry_id": "E2",
-      "date": "2026-11-19",
-      "contact_type": "Besök",
-      "care_unit": "Vårdcentralen Norrdal",
-      "author_role": "Läkare",
-      "contact_reason": "Axelsmärta höger",
-      "note_ids": [
-        "J4",
-        "J5",
-        "J6",
-        "J7"
-      ]
-    }
-  ],
-  "input_text": {
-    "transcript": "Läkare: Vad gäller besöket idag?\nPatient: Min högra axel. Den har gjort ont i ungefär sex veckor nu, och det blir värre.\nLäkare: När gör det mest ont?\nPatient: När jag lyfter armen över huvudet. Och på natten om jag ligger på den sidan, då vaknar jag.\nLäkare: Har du provat något mot det?\nPatient: Ipren ibland. Det tar udden av det, men det håller inte i sig.\nLäkare: Några domningar eller stickningar ner i armen?\nPatient: Nej, inget sådant.\nPatient: Ärligt talat är jag bara trött på det. Jag behöver ett intyg så att jag kan vara hemma ett tag.",
-    "journal": "2026-10-12 · Besök · Rehabmottagningen Söder\nAntecknad av: Fysioterapeut\nKontaktorsak: Axelsmärta höger\nAktuellt: Smärta i höger axel sedan cirka en vecka, värst vid lyft av armen över huvudet.\nStatus: Smärtsam båge vid abduktion höger. Full passiv rörlighet.\nÅtgärd: Hemträningsprogram för axeln. Återbesök vid behov.\n\n2026-11-19 · Besök · Vårdcentralen Norrdal\nAntecknad av: Läkare\nKontaktorsak: Axelsmärta höger\nAnamnes: Smärta i höger axel sedan cirka sex veckor, tilltagande. Värst vid rörelser över huvudet och nattetid vid liggande på höger sida. Tar Ipren vid behov med kortvarig effekt. Inga domningar eller stickningar i armen.\nStatus: Smärtsam båge mellan 70 och 120 graders abduktion höger. Positivt Hawkins och Neer höger. Full passiv rörlighet. Normal kraft.\nBedömning: Bilden talar för impingement i höger axel. Smärtrelaterat nedsatt förmåga att arbeta med höger arm över axelhöjd.\nÅtgärd: Fortsatt hemträning. Ipren vid behov."
-  },
-  "clinician_decisions": {
-    "diagnosis": "Impingementsyndrom i höger axel (M75.4)",
-    "sick_leave_extent_percent": null,
-    "period_start": null,
-    "period_end": null
-  },
-  "expected_facts": [
-    {
-      "section": "functional_impairment",
-      "fact": "Smärtrelaterat nedsatt förmåga att arbeta med höger arm över axelhöjd",
-      "source_ids": [
-        "J6"
-      ]
-    },
-    {
-      "section": "assessment_basis",
-      "fact": "Undersökningsfynden återges som fynd",
-      "source_ids": [
-        "J5"
-      ]
-    },
-    {
-      "section": "assessment_basis",
-      "fact": "Sex veckors tilltagande smärta, värst vid rörelser över huvudet och nattetid, inga domningar eller stickningar, återges som patientens uppgifter",
-      "source_ids": [
-        "T2",
-        "T4",
-        "T8"
-      ]
-    }
-  ],
-  "forbidden_inferences": [
-    "Något yrke eller någon arbetsuppgift.",
-    "Ett påstående om att patienten inte kan arbeta eller har nedsatt arbetsförmåga.",
-    "Någon sjukskrivningsgrad eller period, även som 'förslag'.",
-    "Att patientens önskemål om intyg (T9) behandlas som läkarens bedömning."
-  ],
-  "corrupted_draft": null,
-  "expected_findings": [
-    {
-      "check": "A",
-      "section": "work_tasks",
-      "gap_type": "missing_in_sources",
-      "description": "Varken samtalet eller journalen säger vilket arbete patienten har eller vad det innebär.",
-      "source_ids": [],
-      "acceptable_question": "Vilket arbete har patienten, och vad innebär arbetsuppgifterna, särskilt arbete med armarna över axelhöjd?"
-    },
-    {
-      "check": "B",
-      "section": "activity_limitation",
-      "gap_type": "missing_in_sources",
-      "description": "Det saknas en läkarbedömning av hur axelbesvären begränsar patientens arbete.",
-      "source_ids": [
-        "J6"
-      ],
-      "acceptable_question": "Hur påverkar den nedsatta förmågan att arbeta med höger arm över axelhöjd patientens konkreta arbetsuppgifter?"
-    },
-    {
-      "check": "decision",
-      "section": "sick_leave",
-      "gap_type": "missing_decision",
-      "description": "Sjukskrivningens omfattning och period är inte ifyllda. De ska förbli tomma tills läkaren fyller i dem.",
-      "source_ids": [],
-      "acceptable_question": "Ange sjukskrivningens omfattning och period, om sjukskrivning ska rekommenderas."
-    }
-  ],
-  "must_not_flag": [
-    "Undersökningsfynden och patientens beskrivning, som är korrekt åtskilda om utkastet följer J5 och T2–T8."
-  ]
+  "sourceRevision": 0
 }

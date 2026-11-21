@@ -1,5 +1,7 @@
 # Review behavior — CP4–CP5
 
+The current live workflow also uses the pinned [FK guidance layer](FK_GUIDANCE.md): seven source-linked checks for fields 3, 5, 6 and 7. Every live finding identifies applicable rules, and hover explanations link to their official source. The ruleset version is recorded in provider metadata. This is a scoped, model-assisted review, not a complete certificate or entitlement determination.
+
 The user starts each review with **Granska utkast** or **Granska på nytt**. There is no automatic review call after generation, edits or failures. A live review makes one model request with no automatic retries. Mock development and browser tests need no model calls.
 
 ## Request and validation

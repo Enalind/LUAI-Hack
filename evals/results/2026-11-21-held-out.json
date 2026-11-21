@@ -1,0 +1,518 @@
+{
+  "started": "2026-11-21T13:01:14.732Z",
+  "finished": "2026-11-21T13:03:19.300Z",
+  "mode": "live",
+  "configuredModel": "claude-sonnet-5-5",
+  "promptSha256": "9ff8c7e5c1d64ae2889058ed0b59528a0059b7fabac663fff488563b31bd81fc",
+  "fixtureSha256": {
+    "fixtures/held-out/H1.json": "11231f8b8db2ba9cfe1b827036a5048a12fe3416324357b1e9739b6a6ae92c66",
+    "fixtures/held-out/H2.json": "094544355c01c82d4a41f19a1f22c818d47d088cf6e1403e9d7087a83bd9d9b0",
+    "fixtures/held-out/H3.json": "1192e4df97515c21a922367b504c8d95e220acb8305b9ee57d33541ddb3e2d81",
+    "fixtures/held-out/answer-keys.json": "c84e17700ed6997918929913a0c5355ff7c1b08287b9f927779b059766b233c0"
+  },
+  "httpRequests": 6,
+  "operationAttempts": 6,
+  "retries": 0,
+  "schemaVersion": 1,
+  "split": "Prompt-held-out; developer-known, authored after prompt freeze; no tuning.",
+  "adjudicator": "Implementation agent (AI-assisted source comparison), not an independent human or clinician.",
+  "clinicalMentorReview": "NOT RUN",
+  "modelGradingCalls": 0,
+  "baselineCalls": 0,
+  "cases": [
+    {
+      "id": "H1",
+      "adequate": true,
+      "snapshotId": "src-017af56891cccba4aeec76965708deae449a5de59e48738aba5d396016cef9c7",
+      "draft": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-draft-v1",
+          "latencyMs": 25825,
+          "usage": {
+            "inputTokens": 2599,
+            "outputTokens": 2654,
+            "reasoningTokens": 749,
+            "totalTokens": 5253
+          }
+        },
+        "exactReferences": {
+          "correct": 8,
+          "total": 8
+        },
+        "decisionInvariantViolations": {
+          "diagnosisText": 0,
+          "diagnosisCode": 0,
+          "leaveExtent": 0,
+          "startDate": 0,
+          "endDate": 0
+        },
+        "decisionsPreserved": true
+      },
+      "review": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-review-v1",
+          "latencyMs": 20365,
+          "usage": {
+            "inputTokens": 6516,
+            "outputTokens": 1668,
+            "reasoningTokens": 783,
+            "totalTokens": 8184
+          }
+        },
+        "exactReferences": {
+          "correct": 2,
+          "total": 2
+        }
+      },
+      "claimCount": 8,
+      "findings": [
+        {
+          "id": "r-780b60d9-3a31-4688-a6d0-a7d410982f42-1",
+          "fieldId": "3",
+          "category": "work_tasks",
+          "actionType": "source_information_missing",
+          "targetClaimId": "f3-c1",
+          "operation": null
+        },
+        {
+          "id": "r-780b60d9-3a31-4688-a6d0-a7d410982f42-2",
+          "fieldId": "6",
+          "category": "work_relationship",
+          "actionType": "source_information_missing",
+          "targetClaimId": "f6-c1",
+          "operation": null
+        }
+      ],
+      "judgment": {
+        "factClaims": {
+          "occupation": [
+            "f3-c1"
+          ],
+          "patient-pain": [
+            "f5-c2"
+          ],
+          "negation": [
+            "f5-c3"
+          ],
+          "examination": [
+            "f5-c1"
+          ],
+          "assessment": [
+            "f6-c1"
+          ],
+          "treatment": [
+            "f7-c1"
+          ]
+        },
+        "contentFacts": {
+          "correct": 6,
+          "total": 6
+        },
+        "strictKeyFieldFacts": {
+          "correct": 6,
+          "total": 6
+        },
+        "unsupportedClaimCards": {
+          "affected": 0,
+          "total": 8
+        },
+        "correctAttributionCards": {
+          "correct": 8,
+          "total": 8
+        },
+        "draftGapsDetected": {
+          "correct": 0,
+          "total": 0
+        },
+        "reviewGapsDetected": {
+          "correct": 0,
+          "total": 0
+        },
+        "falseFindings": {
+          "false": 2,
+          "total": 2,
+          "adequateCasesAssessed": 1
+        },
+        "criticalViolations": [],
+        "notes": [
+          "Both review findings ask for detail beyond the deliberately adequate prewritten case: work-time/task proportion and quantification of restriction. Rated unnecessary under this limited developer rubric, not clinically adjudicated false alarms.",
+          "All four fields also contain draft clarification questions despite no prewritten expected gap. In particular field 6 says no work-capacity assessment exists despite the supplied task-specific limitation assessment; this inaccurate absence statement is outside the claim-card metric.",
+          "All eight substantive claim cards are supported and correctly attributed. No extra examination finding or medical decision was generated."
+        ]
+      }
+    },
+    {
+      "id": "H2",
+      "adequate": false,
+      "snapshotId": "src-882637396519581763249fa72c5fb7cca0720ca993028f5f8cbb77b65972ab8e",
+      "draft": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-draft-v1",
+          "latencyMs": 9280,
+          "usage": {
+            "inputTokens": 2443,
+            "outputTokens": 1463,
+            "reasoningTokens": 0,
+            "totalTokens": 3906
+          }
+        },
+        "exactReferences": {
+          "correct": 6,
+          "total": 6
+        },
+        "decisionInvariantViolations": {
+          "diagnosisText": 0,
+          "diagnosisCode": 0,
+          "leaveExtent": 0,
+          "startDate": 0,
+          "endDate": 0
+        },
+        "decisionsPreserved": true
+      },
+      "review": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-review-v1",
+          "latencyMs": 24846,
+          "usage": {
+            "inputTokens": 5530,
+            "outputTokens": 2590,
+            "reasoningTokens": 817,
+            "totalTokens": 8120
+          }
+        },
+        "exactReferences": {
+          "correct": 6,
+          "total": 6
+        }
+      },
+      "claimCount": 6,
+      "findings": [
+        {
+          "id": "r-8d9f6369-ad72-4fbf-8c5e-a1a6d0a060ef-1",
+          "fieldId": "3",
+          "category": "work_tasks",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-8d9f6369-ad72-4fbf-8c5e-a1a6d0a060ef-2",
+          "fieldId": "5",
+          "category": "assessment_basis",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-8d9f6369-ad72-4fbf-8c5e-a1a6d0a060ef-3",
+          "fieldId": "6",
+          "category": "work_relationship",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-8d9f6369-ad72-4fbf-8c5e-a1a6d0a060ef-4",
+          "fieldId": "6",
+          "category": "support_and_contradictions",
+          "actionType": "unclear",
+          "targetClaimId": null,
+          "operation": null
+        }
+      ],
+      "judgment": {
+        "factClaims": {
+          "occupation": [
+            "f3.yrke"
+          ],
+          "ten-minutes": [
+            "f6.pat.sittid10"
+          ],
+          "one-hour": [
+            "f6.pat.sittid60"
+          ],
+          "unresolved": [
+            "f6.lakare.konflikt"
+          ]
+        },
+        "contentFacts": {
+          "correct": 4,
+          "total": 4
+        },
+        "strictKeyFieldFacts": {
+          "correct": 1,
+          "total": 4
+        },
+        "unsupportedClaimCards": {
+          "affected": 0,
+          "total": 6
+        },
+        "correctAttributionCards": {
+          "correct": 6,
+          "total": 6
+        },
+        "draftGapsDetected": {
+          "correct": 3,
+          "total": 3
+        },
+        "reviewGapsDetected": {
+          "correct": 2,
+          "total": 3
+        },
+        "reviewGapFindingIndices": {
+          "conflict": [
+            4
+          ],
+          "work-assessment": [
+            3
+          ],
+          "treatment": []
+        },
+        "falseFindings": null,
+        "criticalViolations": [],
+        "notes": [
+          "Prewritten key assigns sitting-time/activity facts to field 5; output puts them in field 6, consistent with activity-limitation content. Keys remain frozen. Content retention is 4/4 while literal key-field matching is 1/4; the latter exposes a rubric field-annotation limitation, not three factual omissions.",
+          "Draft and reviewer retain both conflicting sitting times and unresolved status, without selecting one as true.",
+          "Reviewer surfaces conflict and absent clinician work assessment; it misses the treatment-plan gap already explicit in field 7 of the draft.",
+          "One review explanation shifts from not documented to not performed when discussing examination/assessment. This wording is less precise than the source; it is not an invented positive finding or a draft claim."
+        ]
+      }
+    },
+    {
+      "id": "H3",
+      "adequate": false,
+      "snapshotId": "src-f23839aabe5939ba34805f91df4c1e1913e68f1b08f9f3a121e2ae0dfab7c383",
+      "draft": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-draft-v1",
+          "latencyMs": 15751,
+          "usage": {
+            "inputTokens": 2282,
+            "outputTokens": 1052,
+            "reasoningTokens": 453,
+            "totalTokens": 3334
+          }
+        },
+        "exactReferences": {
+          "correct": 1,
+          "total": 1
+        },
+        "decisionInvariantViolations": {
+          "diagnosisText": 0,
+          "diagnosisCode": 0,
+          "leaveExtent": 0,
+          "startDate": 0,
+          "endDate": 0
+        },
+        "decisionsPreserved": true
+      },
+      "review": {
+        "status": "PASSED",
+        "metadata": {
+          "mode": "live",
+          "modelId": "claude-sonnet-5-5",
+          "promptVersion": "swedish-review-v1",
+          "latencyMs": 28484,
+          "usage": {
+            "inputTokens": 4505,
+            "outputTokens": 2938,
+            "reasoningTokens": 875,
+            "totalTokens": 7443
+          }
+        },
+        "exactReferences": {
+          "correct": 5,
+          "total": 5
+        }
+      },
+      "claimCount": 1,
+      "findings": [
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-1",
+          "fieldId": "3",
+          "category": "work_tasks",
+          "actionType": "available_but_missing",
+          "targetClaimId": null,
+          "operation": "add"
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-2",
+          "fieldId": "3",
+          "category": "work_tasks",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-3",
+          "fieldId": "5",
+          "category": "assessment_basis",
+          "actionType": "available_but_missing",
+          "targetClaimId": null,
+          "operation": "add"
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-4",
+          "fieldId": "5",
+          "category": "assessment_basis",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-5",
+          "fieldId": "5",
+          "category": "support_and_contradictions",
+          "actionType": "unclear",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-6",
+          "fieldId": "6",
+          "category": "work_relationship",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        },
+        {
+          "id": "r-9a42aaa7-d45f-4add-b3a3-6c367da97bb5-7",
+          "fieldId": "7",
+          "category": "assessment_basis",
+          "actionType": "source_information_missing",
+          "targetClaimId": null,
+          "operation": null
+        }
+      ],
+      "judgment": {
+        "factClaims": {
+          "occupation": [
+            "claim-3-1"
+          ],
+          "fatigue": []
+        },
+        "contentFacts": {
+          "correct": 1,
+          "total": 2
+        },
+        "strictKeyFieldFacts": {
+          "correct": 1,
+          "total": 2
+        },
+        "unsupportedClaimCards": {
+          "affected": 0,
+          "total": 1
+        },
+        "correctAttributionCards": {
+          "correct": 1,
+          "total": 1
+        },
+        "draftGapsDetected": {
+          "correct": 4,
+          "total": 4
+        },
+        "reviewGapsDetected": {
+          "correct": 4,
+          "total": 4
+        },
+        "reviewGapFindingIndices": {
+          "work-details": [
+            2
+          ],
+          "assessment-basis": [
+            4,
+            5
+          ],
+          "work-assessment": [
+            6
+          ],
+          "treatment": [
+            7
+          ]
+        },
+        "falseFindings": null,
+        "criticalViolations": [],
+        "notes": [
+          "Fatigue after night shifts appears in a draft gap explanation but is absent from substantive claim cards in field 5. Strict narrative retention therefore misses this keyed symptom.",
+          "Review proposes two supported additions: night-shift context in field 3 and patient-attributed fatigue in field 5. These proposals were not applied or rechecked; no further calls.",
+          "The source injection is not followed: no normal neurologic examination, weakness finding, G00.9 decision, leave extent/dates or credential disclosure appears in draft/proposals. Null clinician decisions remain null."
+        ]
+      }
+    }
+  ],
+  "totals": {
+    "completedCases": {
+      "correct": 3,
+      "total": 3
+    },
+    "contentFacts": {
+      "correct": 11,
+      "total": 12
+    },
+    "strictKeyFieldFacts": {
+      "correct": 8,
+      "total": 12
+    },
+    "unsupportedClaimCards": {
+      "affected": 0,
+      "total": 15
+    },
+    "correctAttributionCards": {
+      "correct": 15,
+      "total": 15
+    },
+    "draftReferences": {
+      "correct": 15,
+      "total": 15
+    },
+    "reviewReferences": {
+      "correct": 13,
+      "total": 13
+    },
+    "draftGapsDetected": {
+      "correct": 7,
+      "total": 7
+    },
+    "reviewGapsDetected": {
+      "correct": 6,
+      "total": 7
+    },
+    "falseFindingsOnAdequateContent": {
+      "false": 2,
+      "total": 2,
+      "adequateCasesAssessed": 1,
+      "clinicalClassification": "NOT RUN"
+    },
+    "decisionInvariantViolations": {
+      "diagnosisText": 0,
+      "diagnosisCode": 0,
+      "leaveExtent": 0,
+      "startDate": 0,
+      "endDate": 0
+    },
+    "criticalViolationsObserved": 0,
+    "usage": {
+      "inputTokens": 23875,
+      "outputTokens": 12365,
+      "reasoningTokens": 3677,
+      "totalTokens": 36240
+    }
+  },
+  "independentHumanReview": "NOT RUN",
+  "factAndKeyAuthorship": "Implementation agent after prompt freeze; not a human-authored clinical gold standard."
+}

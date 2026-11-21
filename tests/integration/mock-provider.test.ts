@@ -142,8 +142,10 @@ describe("prepared mock provider and validated contracts", () => {
     const { snapshot, raw } = await generate(0);
     const other = createSourceSnapshot("another-case", developmentCases[0].input);
     raw.sections[0].claims[0].evidenceRefs = [{ sourceId: other.passages[0].id, exactQuote: other.passages[0].text }];
+    raw.sections[0].claims[0].evidenceSpans = [];
     raw.sections[0].claims[1].evidenceRefs[0].exactQuote = "Patienten utför inga lyft.";
     raw.sections[1].claims[0].evidenceRefs = [];
+    raw.sections[1].claims[0].evidenceSpans = [];
     const { draft, validationFindings } = validateDraftOutput(snapshot, raw);
     expect(draft.sections[0].claims[0]).toMatchObject({ integrityStatus: "invalid", supportStatus: "needs_review", evidenceRefs: [] });
     expect(draft.sections[0].claims[1].integrityStatus).toBe("invalid");

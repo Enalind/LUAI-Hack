@@ -8,6 +8,7 @@ import { getCertificateProvider } from "./provider-factory";
 import { validateReviewOutput } from "./provider-output";
 import { readJsonRequest } from "./request-body";
 import { validateSourceSnapshot } from "./source-snapshot";
+import { validateDiagnosisCode } from "./diagnosis-codes";
 
 function safeError(error: unknown, requestId: string): { body: ApiError; status: number } {
   if (error instanceof ApplicationError) return { body: { code: error.code, message: error.message, retryable: error.retryable, requestId }, status: error.status };
@@ -24,6 +25,7 @@ export function createReviewHandler(providerFactory: () => CertificateProvider =
     try {
       const parsed = await readJsonRequest(request, reviewRequestSchema);
       requestId = parsed.requestId;
+      validateDiagnosisCode(parsed.explicitDecision.diagnosisCode);
       let snapshot;
       try { snapshot = validateSourceSnapshot(parsed.snapshot); }
       catch { throw new ApplicationError("INVALID_INPUT", "Källversionen stämmer inte med originalunderlaget. Skapa ett nytt utkast.", 400); }
@@ -31,9 +33,16 @@ export function createReviewHandler(providerFactory: () => CertificateProvider =
       codeFindings = deterministicReview(snapshot, input.draft);
       const output = await providerFactory().review({ snapshot, draft: input.draft }, { signal: request.signal });
       const validated = validateReviewOutput(snapshot, input.draft, output);
+      const findings = mergeReviewFindings(codeFindings, validated.findings, requestId);
+      // Model coverage cannot suppress an independently detected empty-field warning.
+      const guidelineChecks = validated.guidelineChecks?.map((check) => check.status === "no_issue_identified"
+        && findings.some((finding) => finding.guidelineRuleIds?.includes(check.ruleId))
+        ? { ...check, status: "needs_review" as const } : check);
       return Response.json(reviewResultSchema.parse({
         requestId, sourceRevision: input.sourceRevision, draftRevision: input.draftRevision,
-        findings: mergeReviewFindings(codeFindings, validated.findings, requestId), completionStatus: "complete", metadata: validated.metadata, error: null,
+        findings,
+        ...(guidelineChecks ? { guidelineChecks } : {}),
+        completionStatus: "complete", metadata: validated.metadata, error: null,
       }), { headers });
     } catch (error) {
       const safe = safeError(error, requestId);

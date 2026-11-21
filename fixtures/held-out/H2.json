@@ -1,0 +1,17 @@
+{
+  "id": "H2",
+  "label": "Kassaarbete – motstridiga uppgifter om sittid",
+  "adequate": false,
+  "input": {
+    "consultationText": "Patienten: Jag arbetar som kassör och sitter vid kassan under arbetspasset.\nPatienten klockan 09:10: Jag kan sitta vid kassan högst tio minuter innan jag måste resa mig.\nPatienten klockan 09:20: Jag kan sitta vid kassan i en timme utan paus.",
+    "clinicianAssessmentText": "Uppgifterna om sittid skiljer sig och har inte kunnat klarläggas vid besöket.\nIngen fysisk undersökning eller bedömning av arbetsförmågan är dokumenterad. Ingen behandlingsplan är ännu bestämd.",
+    "explicitDecision": {
+      "diagnosisText": null,
+      "diagnosisCode": null,
+      "leaveExtent": null,
+      "startDate": null,
+      "endDate": null
+    },
+    "sourceRevision": 0
+  }
+}

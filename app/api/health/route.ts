@@ -1,4 +1,4 @@
-import { ConfigurationError, getServerConfig } from "@/lib/server/config";
+import { ConfigurationError, getServerConfig } from "../../../lib/server/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,7 +7,7 @@ export function GET() {
   const requestId = crypto.randomUUID();
   try {
     const { mode } = getServerConfig();
-    return Response.json({ status: "ok", mode, checkpoint: "CP5" }, {
+    return Response.json({ status: "ok", mode, checkpoint: "CP6" }, {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {

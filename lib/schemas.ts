@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FK_RULE_IDS } from "./fk-guidance";
 
 export const MAX_TEXT_CHARACTERS = 30_000;
 export const MAX_SOURCE_CHARACTERS = 60_000;
@@ -33,25 +34,40 @@ export const explicitDecisionSchema = z.strictObject({
   }
 });
 
+export const referenceMaterialSchema = z.strictObject({
+  id: idSchema.max(64),
+  type: z.enum(["consultation", "journal", "assessment", "lab", "other"]),
+  title: z.string().trim().min(1).max(160),
+  text: textSchema,
+});
+export type ReferenceMaterial = z.infer<typeof referenceMaterialSchema>;
+
 export const sourceInputSchema = z.strictObject({
   consultationText: textSchema,
   clinicianAssessmentText: textSchema,
+  referenceMaterials: z.array(referenceMaterialSchema).max(30).optional(),
   explicitDecision: explicitDecisionSchema,
   sourceRevision: revisionSchema,
 }).superRefine((input, ctx) => {
-  if (!input.consultationText.trim() && !input.clinicianAssessmentText.trim()) {
+  if (!input.consultationText.trim() && !input.clinicianAssessmentText.trim() && !input.referenceMaterials?.some((material) => material.text.trim())) {
     ctx.addIssue({ code: "custom", message: "Besöksunderlag eller läkarens bedömning måste innehålla text." });
   }
   const decisionText = DECISION_FIELDS.map((key) => input.explicitDecision[key])
     .filter((value): value is string => typeof value === "string").join("");
-  if (input.consultationText.length + input.clinicianAssessmentText.length + decisionText.length > MAX_SOURCE_CHARACTERS) {
+  if (new Set(input.referenceMaterials?.map(({ id }) => id)).size !== (input.referenceMaterials?.length ?? 0)) {
+    ctx.addIssue({ code: "custom", message: "Underlagens ID:n måste vara unika." });
+  }
+  if (input.consultationText.length + input.clinicianAssessmentText.length + decisionText.length + (input.referenceMaterials?.reduce((sum, item) => sum + item.text.length, 0) ?? 0) > MAX_SOURCE_CHARACTERS) {
     ctx.addIssue({ code: "custom", message: "Underlaget får sammanlagt innehålla högst 60 000 tecken." });
   }
 });
 
 export const sourcePassageSchema = z.strictObject({
   id: idSchema,
-  origin: z.enum(["consultation", "clinician_assessment", "clinician_decision"]),
+  origin: z.enum(["consultation", "clinician_assessment", "clinician_decision", "reference_material"]),
+  materialId: idSchema.optional(),
+  materialTitle: z.string().max(160).optional(),
+  materialType: referenceMaterialSchema.shape.type.optional(),
   text: nonemptyTextSchema,
   decisionField: z.enum(DECISION_FIELDS).nullable(),
 }).superRefine((passage, ctx) => {
@@ -82,6 +98,8 @@ export const sourceSnapshotSchema = z.strictObject({
 export const evidenceRefSchema = z.strictObject({ sourceId: idSchema, exactQuote: nonemptyTextSchema });
 const evidenceRefsSchema = z.array(evidenceRefSchema).max(20);
 const informationGapsSchema = z.array(nonemptyTextSchema).max(20);
+export const textSpanSchema = z.strictObject({ text: nonemptyTextSchema, occurrence: z.number().int().min(1).max(30_000) });
+export const evidenceSpanSchema = textSpanSchema.extend({ referenceIndices: z.array(z.number().int().min(0).max(19)).min(1).max(20) });
 
 // Provider contracts deliberately contain no decision fields or verification statuses.
 export const providerClaimSchema = z.strictObject({
@@ -89,6 +107,7 @@ export const providerClaimSchema = z.strictObject({
   fieldId: fieldIdSchema,
   text: nonemptyTextSchema,
   evidenceRefs: evidenceRefsSchema,
+  evidenceSpans: z.array(evidenceSpanSchema).max(100).optional(),
 });
 export const draftClaimSchema = providerClaimSchema.extend({
   integrityStatus: z.enum(["valid", "invalid", "missing", "unverified"]),
@@ -134,8 +153,10 @@ export const findingSchema = z.strictObject({
   actionType: z.enum(["available_but_missing", "source_information_missing", "unsupported_or_conflicting", "unclear"]),
   priority: z.enum(["needs_review", "clarification"]),
   targetClaimId: idSchema.nullable(),
+  targetSpan: textSpanSchema.nullable().optional(),
   fieldId: fieldIdSchema,
   explanation: nonemptyTextSchema,
+  guidelineRuleIds: z.array(z.enum(FK_RULE_IDS)).min(1).max(FK_RULE_IDS.length).optional(),
   evidenceRefs: evidenceRefsSchema,
   proposedChange: proposedChangeSchema.nullable(),
   question: nonemptyTextSchema.nullable(),
@@ -160,10 +181,16 @@ export const findingSchema = z.strictObject({
 const findingsSchema = z.array(findingSchema).max(1_000).superRefine((findings, ctx) => {
   checkUnique(findings.map(({ id }) => id), ctx, "Fynd-ID:n");
 });
+export const guidelineCheckSchema = z.strictObject({
+  ruleId: z.enum(FK_RULE_IDS),
+  status: z.enum(["no_issue_identified", "needs_review", "not_assessable"]),
+});
+const guidelineChecksSchema = z.array(guidelineCheckSchema).length(FK_RULE_IDS.length);
 export const providerMetadataSchema = z.strictObject({
   mode: z.enum(["mock", "live"]),
   modelId: z.string().min(1).max(200),
   promptVersion: z.string().min(1).max(100),
+  guidanceVersion: z.string().min(1).max(100).optional(),
   latencyMs: z.number().nonnegative(),
   usage: z.strictObject({
     inputTokens: z.number().int().nonnegative().nullable(),
@@ -173,7 +200,7 @@ export const providerMetadataSchema = z.strictObject({
   }).nullable(),
 });
 export const providerDraftOutputSchema = z.strictObject({ sections: providerSectionsSchema, metadata: providerMetadataSchema });
-export const providerReviewOutputSchema = z.strictObject({ findings: findingsSchema.max(200), metadata: providerMetadataSchema });
+export const providerReviewOutputSchema = z.strictObject({ findings: findingsSchema.max(200), guidelineChecks: guidelineChecksSchema.optional(), metadata: providerMetadataSchema });
 
 export const requestContextSchema = z.strictObject({
   requestId: z.string().uuid(), sourceRevision: revisionSchema, draftRevision: revisionSchema,
@@ -224,6 +251,7 @@ export const sourceSnapshotResponseSchema = requestContextSchema.extend({ snapsh
 });
 export const reviewResultSchema = requestContextSchema.extend({
   findings: findingsSchema,
+  guidelineChecks: guidelineChecksSchema.optional(),
   completionStatus: z.enum(["complete", "incomplete"]),
   metadata: providerMetadataSchema.nullable(),
   error: apiErrorSchema.nullable(),

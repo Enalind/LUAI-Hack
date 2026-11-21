@@ -1,10 +1,16 @@
 import { validateEvidenceReferences } from "./evidence";
 import type { DraftDocument, FieldId, Finding, SourceSnapshot } from "./schemas";
+import type { FkRuleId } from "./fk-guidance";
+
+const emptyFieldRules: Record<FieldId, FkRuleId[]> = {
+  "3": ["fk3-occupation"], "5": ["fk5-function", "fk5-basis"],
+  "6": ["fk6-activity", "fk6-work"], "7": ["fk7-treatment"],
+};
 
 const emptyQuestions: Record<FieldId, string> = {
-  "3": "Finns yrke och konkreta arbetsuppgifter i underlaget, eller behöver de kompletteras?",
+  "3": "Vilken sysselsättning bedöms arbetsförmågan mot, och finns konkreta arbetsuppgifter om patienten arbetar?",
   "5": "Finns funktionsnedsättning och bedömningsgrund dokumenterade, eller behöver de kompletteras?",
-  "6": "Finns läkarens bedömda begränsningar i relation till arbetet dokumenterade, eller behöver de kompletteras?",
+  "6": "Finns läkarens bedömda begränsningar i relation till arbete eller annan sysselsättning dokumenterade, eller behöver de kompletteras?",
   "7": "Finns pågående eller planerad behandling dokumenterad, eller behöver den kompletteras?",
 };
 const categories: Record<FieldId, Finding["category"]> = {
@@ -18,6 +24,7 @@ export function deterministicReview(snapshot: SourceSnapshot, draft: DraftDocume
     if (!section.claims.length) findings.push({
       id: `code-empty-${section.fieldId}`, category: categories[section.fieldId], actionType: "unclear", priority: "clarification",
       fieldId: section.fieldId, targetClaimId: null, evidenceRefs: [], proposedChange: null,
+      guidelineRuleIds: emptyFieldRules[section.fieldId],
       explanation: "Intygsfältet saknar text. En tom sektion avgör inte om information finns i källan eller saknas helt.", question: emptyQuestions[section.fieldId],
     });
     section.claims.forEach((claim, index) => {

@@ -17,7 +17,7 @@ describe("bounded server request parsing", () => {
     expect(await readJsonRequest(request(JSON.stringify(body)), draftRequestSchema)).toEqual(body);
   });
 
-  it.each(["not json", "null", "[]", "{}", JSON.stringify({ ...body, input: { ...body.input, consultationText: "  " } })])("rejects malformed or invalid input safely", async (text) => {
+  it.each(["not json", "null", "[]", "{}", JSON.stringify({ ...body, input: { ...body.input, consultationText: "  ", referenceMaterials: [] } })])("rejects malformed or invalid input safely", async (text) => {
     await expect(readJsonRequest(request(text), draftRequestSchema)).rejects.toMatchObject({ code: "INVALID_INPUT", status: 400, retryable: false });
   });
 

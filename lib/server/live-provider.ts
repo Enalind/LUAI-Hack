@@ -1,6 +1,8 @@
 import "server-only";
+import { FK_GUIDANCE_VERSION } from "../fk-guidance";
+import { assembleDraftContent } from "./draft-content";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { APICallError, generateText, NoObjectGeneratedError, NoOutputGeneratedError, Output } from "ai";
+import { APICallError, generateText, NoObjectGeneratedError, NoOutputGeneratedError, Output, stepCountIs, tool } from "ai";
 import { z } from "zod";
 import { decisionsEqual, draftDocumentSchema, type ProviderMetadata, type SourceSnapshot } from "../schemas";
 import type { getServerConfig } from "./config";
@@ -8,11 +10,14 @@ import { ApplicationError } from "./errors";
 import type { CertificateProvider, ProviderCallOptions, ProviderReviewInput } from "./provider";
 import { validateDraftOutput, validateReviewOutput } from "./provider-output";
 import { validateSourceSnapshot } from "./source-snapshot";
+import { diagnosisCatalogue, searchDiagnosisCodes } from "./diagnosis-codes";
 import { DRAFT_PROMPT_VERSION, DRAFT_SYSTEM_PROMPT, draftUserData, liveDraftContentSchema,
   REVIEW_PROMPT_VERSION, REVIEW_SYSTEM_PROMPT, reviewUserData, liveReviewContentSchema } from "./prompts";
 
 export const LIVE_TIMEOUT_MS = 60_000;
-export const MAX_OUTPUT_TOKENS = 6_000;
+// Thinking and the structured draft share this budget. The longer transcripts
+// require more space than the original short-fixture limit allowed.
+export const MAX_OUTPUT_TOKENS = 12_000;
 const MAX_RETRY_DELAY_MS = 5_000;
 type LiveConfig = Extract<ReturnType<typeof getServerConfig>, { mode: "live" }>;
 type LiveProviderOptions = { fetch?: typeof globalThis.fetch; timeoutMs?: number; maxRetries?: 0 | 1 };
@@ -22,6 +27,9 @@ function timeoutError() {
 }
 function invalidOutput(): never {
   throw new ApplicationError("INVALID_MODEL_OUTPUT", "Modellsvaret kunde inte valideras mot underlaget. Försök igen eller kontrollera källorna.", 502);
+}
+function outputLimitError() {
+  return new ApplicationError("GENERATION_FAILED", "Modellsvaret nådde sin längdgräns innan det blev klart. Dina uppgifter finns kvar. Försök igen.", 502);
 }
 
 /** Enforce the deadline even if a transport ignores AbortSignal. */
@@ -55,6 +63,7 @@ function retryDelay(error: APICallError): number {
 function safeProviderError(error: unknown): ApplicationError {
   if (error instanceof ApplicationError) return error;
   if (NoObjectGeneratedError.isInstance(error) || NoOutputGeneratedError.isInstance(error)) {
+    if (NoObjectGeneratedError.isInstance(error) && error.finishReason === "length") return outputLimitError();
     if (NoObjectGeneratedError.isInstance(error) && error.finishReason === "content-filter") {
       return new ApplicationError("GENERATION_FAILED", "Modellen avböjde förfrågan. Kontrollera det fiktiva underlaget.", 502);
     }
@@ -86,8 +95,19 @@ export class LiveProvider implements CertificateProvider {
           const result = await abortable(generateText({
             model: anthropic(this.config.model),
             system, prompt,
+            ...(promptVersion === DRAFT_PROMPT_VERSION ? {
+              tools: { search_diagnosis_codes: tool({
+                description: "Slå upp en dokumenterad diagnos eller kod i officiella ICD-10-SE 2026. Ger kod, svensk kodtext och om den är valbar som huvuddiagnos. Verktyget ställer ingen diagnos.",
+                inputSchema: z.object({ query: z.string().min(2).max(150) }),
+                execute: async ({ query }) => ({ catalogue: diagnosisCatalogue, results: searchDiagnosisCodes(query) }),
+              }) },
+              stopWhen: stepCountIs(4),
+            } : {}),
             output: Output.object({ schema, name: "certificate_output" }),
-            providerOptions: { anthropic: { structuredOutputMode: "outputFormat" } },
+            providerOptions: { anthropic: { structuredOutputMode: "outputFormat",
+              // Keep review reasoning above drafting while bounding latency for the seven-rule check.
+              effort: promptVersion === DRAFT_PROMPT_VERSION ? "low" as const : "medium" as const,
+            } },
             maxOutputTokens: MAX_OUTPUT_TOKENS,
             maxRetries: 0, // Retry here so long Retry-After values never get shortened by SDK defaults.
             abortSignal: signal,
@@ -96,6 +116,7 @@ export class LiveProvider implements CertificateProvider {
             telemetry: { isEnabled: false, recordInputs: false, recordOutputs: false },
           }), signal);
           if (result.finishReason !== "stop") {
+            if (result.finishReason === "length") throw outputLimitError();
             throw new ApplicationError("GENERATION_FAILED", result.finishReason === "content-filter"
               ? "Modellen avböjde förfrågan. Kontrollera det fiktiva underlaget."
               : "Modellsvaret avslutades innan ett fullständigt svar skapades. Försök igen.", 502);
@@ -105,7 +126,7 @@ export class LiveProvider implements CertificateProvider {
           const usage = result.totalUsage;
           const metadata: ProviderMetadata = {
               mode: "live" as const, modelId: result.response.modelId ?? this.config.model,
-              promptVersion, latencyMs: Date.now() - started,
+              promptVersion, guidanceVersion: FK_GUIDANCE_VERSION, latencyMs: Date.now() - started,
               usage: { inputTokens: usage.inputTokens ?? null, outputTokens: usage.outputTokens ?? null,
                 reasoningTokens: usage.outputTokenDetails.reasoningTokens ?? null, totalTokens: usage.totalTokens ?? null },
           };
@@ -133,9 +154,11 @@ export class LiveProvider implements CertificateProvider {
     const result = await this.generate(liveDraftContentSchema, DRAFT_SYSTEM_PROMPT, draftUserData(snapshot), DRAFT_PROMPT_VERSION,
       (content, metadata) => {
         if (content.sections.some((section) => !section.claims.length && !section.informationGaps.length)) invalidOutput();
-        if (validateDraftOutput(snapshot, { ...content, metadata }).validationFindings.length) invalidOutput();
+        const assembled = assembleDraftContent(content);
+        if (assembled.sections.some((section) => section.claims.some((claim) => !claim.evidenceSpans.length))) invalidOutput();
+        if (validateDraftOutput(snapshot, { ...assembled, metadata }).validationFindings.length) invalidOutput();
       }, options, this.options.maxRetries ?? 1);
-    return { ...result.content, metadata: result.metadata };
+    return { ...assembleDraftContent(result.content), metadata: result.metadata };
   }
 
   async review({ snapshot: value, draft: draftValue }: ProviderReviewInput, options: ProviderCallOptions = {}) {
@@ -145,7 +168,10 @@ export class LiveProvider implements CertificateProvider {
       throw new ApplicationError("INVALID_INPUT", "Läkarens beslut måste motsvara källversionen.", 400);
     }
     const result = await this.generate(liveReviewContentSchema, REVIEW_SYSTEM_PROMPT, reviewUserData({ snapshot, draft }), REVIEW_PROMPT_VERSION,
-      (content, metadata) => { validateReviewOutput(snapshot, draft, { ...content, metadata }); }, options, 0);
+      (content, metadata) => {
+        if (content.findings.some((finding) => finding.targetClaimId !== null && !finding.targetSpan)) invalidOutput();
+        validateReviewOutput(snapshot, draft, { ...content, metadata });
+      }, options, 0);
     return { ...result.content, metadata: result.metadata };
   }
 }

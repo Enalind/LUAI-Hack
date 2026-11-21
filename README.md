@@ -1,8 +1,14 @@
-# Intyg som håller
+# Asteria · Intygsstöd
 
-Swedish-language prototype for source-linked FK7804 narrative drafts. **Only fictional patient cases.**
+Swedish-language prototype for source-linked FK7804 narrative drafts, using the supplied Asteria visual identity. **Only fictional patient cases.**
 
-CP0–CP5 implementation is complete: fictional case loading, editable source-linked drafts, separate clinician decisions, direct Anthropic drafting and an explicit review workflow with questions, evidence and proposed changes. Mock flows and one live draft/review smoke each are verified; clinical quality and held-out evaluation remain untested. Revision-scoped accept/dismiss, source supplementation with preserved manual text, field copying and separate JSON reports are implemented. CP5 required zero live model calls. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), and [implementation status](docs/IMPLEMENTATION_STATUS.md).
+CP0–CP6 implementation is complete: fictional case loading, editable source-linked drafts, separate clinician decisions, direct Anthropic drafting and an explicit review workflow with questions, evidence and proposed changes. Mock workflows, the earlier live smokes and a frozen three-case prompt-held-out evaluation are verified. The evaluation found omissions and extra clarification requests; independent human/clinical validation remains unperformed. Revision-scoped accept/dismiss, source supplementation with preserved manual text, field copying and separate JSON reports are implemented. CP5 required zero live model calls; CP6 used exactly six, without retries or a separate model grader. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), and [implementation status](docs/IMPLEMENTATION_STATUS.md).
+
+Drafting and review now use a pinned, source-linked [Försäkringskassan guidance layer](docs/FK_GUIDANCE.md) for fields 3, 5, 6 and 7. Live review must account for all seven guidance areas; findings and hover explanations link to their official source. This is scoped assistance, not full certificate or entitlement validation.
+
+## Visual identity
+
+The UI uses the supplied Asteria wordmark and favicon, local Newsreader and Manrope fonts, and forest typography with a pale green workspace and white document surfaces. Font licenses are bundled with the assets. The original planning documents retain the working name “Intyg som håller”. See [brand implementation](docs/BRAND_IDENTITY.md) for asset provenance and visual rules.
 
 ## Local setup
 
@@ -17,11 +23,11 @@ npm run dev
 
 Open http://localhost:3000. Mock mode is the default and requires no provider key. Work stays in browser memory; reloading clears inputs and edits.
 
-1. Select one of the three fictional Swedish examples. Optional clinician decision fields can be changed or left empty.
-2. Select **Skapa intygsutkast**. The app displays fields 3, 5, 6 and 7, with missing information shown as questions.
-3. Select a **Källa** button to focus and highlight its original passage. On narrow screens, this also opens the Underlag tab. Arrow keys navigate the workspace tabs.
-4. Edit individual claim cards. Their previous citations remain visible as unverified suggestions. Source/decision edits mark the whole draft as belonging to an older source version. **Ersätt med nytt utkast** replaces the current draft; switching examples clears it.
-5. Select **Granska utkast** to run code checks plus mock/model-assisted review. Follow finding citations, inspect proposed additions/replacements/deletions, or use **Komplettera underlaget** to focus the assessment input. Proposals never change text automatically.
+1. Start on **Underlag** (`/underlag`, also the home page). Use **+ Lägg till underlag** to choose a visit note, journal note, clinician assessment, lab/inspection result, or other reference. Give each document a title and paste its text. For mock mode, open **Prova med ett fiktivt exempel** and select a prepared case. Optional clinician decisions can be entered or left empty.
+2. Select **Skapa intygsutkast** to move to **Intygsutkast** (`/utkast`). Edit fields 3, 5, 6 and 7 directly in the document. A shared layout preserves inputs and edits across navigation; reloading still clears them.
+3. Hover a highlighted phrase for a floating preview of the sources supporting that specific phrase, including document titles and source version. There are no citation rows in the text. **Alt + ↓** opens the preview from the keyboard; **Escape** dismisses it. Select **Öppna originalunderlaget** inside the preview to open **Underlag** and focus the original passage. Workflow navigation uses ordinary links on desktop and mobile.
+4. Edit individual statements directly in the document. Editing clears that statement’s phrase anchors; previous citations remain available with Alt + ↓ and are labelled as earlier support until rechecked. Source/decision edits mark the whole draft as belonging to an older source version. **Ersätt med nytt utkast** replaces the current draft; switching examples clears it.
+5. Select **Granska** to open **Granskning** (`/granskning`) and run code checks plus mock/model-assisted review. The document highlights the specific wording needing review. Hover a marked phrase for the explanation, relevant sources and linked FK guidance; missing information marks the field heading, because there is no existing phrase to select. Detailed findings and proposals remain alongside the document. Editing removes outdated highlights. Follow finding citations, inspect proposed additions/replacements/deletions, or use **Komplettera underlaget** to focus the assessment input. Proposals never change text automatically.
 6. Use **Acceptera förslag** or **Avfärda fynd**, optionally with a clinician note. Acceptance changes only the target section/claim and makes the review stale. Dismissal keeps the text and does not verify it.
 7. Add missing clinician facts with **Lägg till läkaruppgift i underlaget**. Select **Granska** to update the immutable source version and recheck the existing draft, preserving manual edits. This performs no draft-generation call. **Ersätt med nytt utkast** remains a deliberate replacement.
 8. Select **Granska på nytt** after changes. Old findings remain stale until a complete recheck succeeds. A failed review preserves editable text and allows retry.
@@ -38,15 +44,31 @@ The prepared mock supports the examples' original consultation/assessment plus e
 | `npm run lint` | ESLint directly, with zero warnings |
 | `npm run typecheck` | TypeScript without emitting files |
 | `npm test` | Deterministic contract, source, provider, draft/review handler and workspace state tests; never uses real credentials or live calls |
-| `npm run test:e2e` | Chromium draft/review/evidence/error/tab flows; starts its own mock server on port 3100 |
+| `npm run test:e2e` | Chromium dashboard/draft/review/evidence/error/navigation flows; starts its own mock server on port 3100 |
 | `npm run test:e2e:ui` | Interactive Playwright runner |
 | `npm run smoke:live` | Explicit, potentially billable single live D1 draft; no retries; exits 2 with NOT RUN if no key |
 | `npm run smoke:review` | Explicit single live review of a prepared corrupted D1 draft; zero live draft calls and no retries |
-| `npm run eval:live` | Explicit NOT RUN error until the later held-out evaluation is implemented |
+| `npm run eval:live` | Explicit potentially billable H1–H3 evaluation: at most six requests, no retries; use `-- --limit 1` for two requests |
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build locally |
 
 Install the test browser once with `npx playwright install chromium` before browser tests.
+
+## Phrase highlights
+
+The current draft prompt is `swedish-draft-v3-spans`; review uses `swedish-review-v2-spans`. Draft statements include `evidenceSpans`: exact phrases, a one-based occurrence, and zero-based indexes into that statement's evidence references. Review findings identify an exact `targetSpan` in the current statement, or null when information has no existing text to mark. The server checks these matches against the actual text; it does not guess or normalize a target. Intersecting annotations are rendered without changing the document.
+
+Native textarea editing, undo, selection and copying remain available. A text mirror paints the phrase marks; it is hidden from screen readers. Editing clears the affected statement's anchors, and stale review markings disappear. Hover, touch and Alt + ↓ expose source/review details; Escape dismisses the panel. Copy/export remains plain current claim text.
+
+Verification: 239 deterministic tests, 34 existing browser checks and two additional phrase-specific browser checks passed, plus production build/typecheck. Live D1 drafting and review passed the updated contracts; first live attempts also produced validation failures, so these runs are not a reliability or clinical-quality guarantee. Frozen H1–H3 were not changed or rerun.
+
+## Official diagnosis codes
+
+Search by Swedish diagnosis text or code in **Läkarens beslut**. Select a result to use the official code and title, or enter a code for exact validation. The bundled server index contains 38,631 individual codes from **ICD-10-SE 2026**, including national extensions. The clinician selects the diagnosis; generation and review reject unknown codes, unspecific categories with children and unsuitable primary codes. Empty codes remain allowed.
+
+`GET /api/diagnosis-codes?q=lumbago&code=M54.5` returns bounded results, an exact match and source/version metadata. It searches locally and sends no data to an external coding service. The live draft model can call `search_diagnosis_codes`; draft generation has at most four model steps within its existing timeout. Catalogue matches do not establish clinical appropriateness. See [catalogue source and reproducible import](data/README.md).
+
+The hover-reference and long-example update passes **226 deterministic tests and 34 mock browser checks**, including touch access and every prepared citation, plus production build/typecheck. No live calls were made for these changes. The original dashboard update passed **223 deterministic tests and 33 mock browser checks**, plus typecheck and production build. The new diagnosis tool round trip is verified with a simulated Anthropic transport. No new live calls were made; previous live evaluation results apply to the earlier prompt, not `swedish-draft-v2-icd`.
 
 ## Server configuration
 
@@ -58,15 +80,17 @@ For a new setup, copy `.env.example` to ignored `.env.local`. An existing ignore
 | `ANTHROPIC_API_KEY` | empty | Required only in live mode; server-only |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | Live draft/review model; a blank value in live mode is invalid |
 
-`GET /api/health` checks configuration and returns only the mode and checkpoint (`CP5`), or a safe HTTP 503 configuration error. It does not check provider connectivity or account/model access. The page also displays configuration errors. Live failures never fall back to mock.
+`GET /api/health` checks configuration and returns only the mode and checkpoint (`CP6`), or a safe HTTP 503 configuration error. It does not check provider connectivity or account/model access. The page also displays configuration errors. Live failures never fall back to mock.
 
-To try live drafting/review, set `AI_MODE=live` and a valid `ANTHROPIC_API_KEY` in ignored `.env` or `.env.local`, then restart the app. `ANTHROPIC_MODEL` remains configurable on the server. Each operation uses direct Anthropic structured output, a 6,000-token output cap and a 60-second deadline. Drafting allows at most one short 429/5xx retry; review uses exactly one attempt, with no automatic retries or automatic review after generation. The browser allows 70 seconds for a safe error to return. See [live provider operation](docs/LIVE_PROVIDER.md).
+To try live drafting/review locally, set `AI_MODE=live` and a valid `ANTHROPIC_API_KEY` in ignored `.env` or `.env.local`, then restart the app. `ANTHROPIC_MODEL` remains configurable on the server. Each operation uses direct Anthropic structured output, a 12,000-token output cap per model step and a 60-second deadline. Drafting explicitly uses low reasoning effort to leave room for the structured document; review explicitly uses medium reasoning effort for the seven-rule guidance check. A response cut off by the output limit gets a specific Swedish error. Drafting allows at most one short 429/5xx retry; review uses exactly one attempt, with no automatic retries or automatic review after generation. The browser allows 70 seconds for a safe error to return. See [live provider operation](docs/LIVE_PROVIDER.md).
+
+Vercel deployments require explicit `AI_MODE=mock`; live mode on Vercel fails with a configuration error before any provider request. Keep the public demo key-free. Node.js is pinned to `24.x`. See [deployment readiness](docs/DEPLOYMENT.md) for environment, runtime and duration settings. No deployment has occurred.
 
 ## CP1 modules
 
 Shared Zod contracts are in `lib/schemas.ts`; pure segmentation and quote validation are in `lib/sources.ts` and `lib/evidence.ts`. Server-only modules create and verify source snapshots, enforce the 256 KB streaming request limit, expose the two-operation provider interface, and validate prepared draft/review output. Output decision fields are copied exclusively from clinician input. Invalid citations are removed from validated evidence and retained as explicit integrity findings.
 
-[Development fixtures](fixtures/development/README.md) contain D1–D3 and independently written answer keys. The active Swedish cases are defined in `cases.ts`; the separate JSON fixtures imported from origin (now translated to Swedish) are preserved and are not currently wired to mock generation. Neither set is held-out evaluation data.
+[Development fixtures](fixtures/development/README.md) contain three canonical JSON examples with 58–65 timestamped turns (about 1,300–1,400 words), two dated journal notes per case and valid clinician-selected diagnosis codes. `cases.ts` loads these same files into the app. The prepared mock cites the longer transcripts and notes by exact content. These development cases and their rubric are synthetic and are separate from the unchanged frozen evaluation set.
 
 `POST /api/draft` accepts the shared `draftRequestSchema` contract, applies bounded JSON reading and validation before provider selection, creates a source snapshot, selects mock/live explicitly, validates evidence, and returns `draftResponseSchema` with the original snapshot and captured request/revision identifiers. Errors have safe Swedish messages, a machine code, request ID and retry flag. Responses use `Cache-Control: no-store`. Client request IDs and both revisions prevent late results from overwriting edits or appearing in another case; superseded requests are also aborted where possible. Live output with missing/invalid evidence fails explicitly. Mock output can retain an invalid-reference finding with unusable references removed.
 
@@ -78,4 +102,8 @@ Shared Zod contracts are in `lib/schemas.ts`; pure segmentation and quote valida
 
 Actual results are recorded in [TEST_REPORT.md](docs/TEST_REPORT.md). [EVALUATION_REPORT.md](docs/EVALUATION_REPORT.md) explicitly separates software checks from unperformed live evaluation.
 
-No deployment has occurred. Draft/review routes declare Node.js and `maxDuration = 120`; selected-plan duration support and deployment access protection remain CP6 checks. Do not expose paid live endpoints without deployment access protection; use mock for a public demo.
+CP6 passed 216 deterministic tests, 29 mock browser checks, lint, typecheck and production build. The three complete browser journeys cover acceptance/copy, source supplementation with retained edits, and timeout/retry/stale-response recovery. See the [demo checklist](docs/DEMO_CHECKLIST.md).
+
+The live H1–H3 run completed three cases in six requests: 15/15 draft references and 13/13 review/proposal references matched, with no decision-invariant violation. Source comparison found one symptom omitted from claim text and recovered by review, one review gap missed, and extra clarification requests on the adequate case. These AI-assisted judgments are not clinical validation; see the detailed [evaluation report](docs/EVALUATION_REPORT.md). Prompts were not tuned or rerun after the probe.
+
+No deployment has occurred. The public deployment policy is mock-only; actual Vercel account settings/protection remain unverified until an authorized deployment is inspected. The app is a local prototype, and no clinical effectiveness, time-saving or approval-rate claim is established.

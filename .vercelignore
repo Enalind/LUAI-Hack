@@ -1,0 +1,8 @@
+.env*
+.local/
+test-results/
+playwright-report/
+coverage/
+tests/
+evals/
+fixtures/held-out/

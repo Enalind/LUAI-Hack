@@ -16,7 +16,7 @@ export function applyFindingSuggestion(draft: DraftDocument, snapshot: SourceSna
     claims: change.operation === "add"
       ? [...item.claims, { id: newClaimId, fieldId: item.fieldId, text: change.text, evidenceRefs: change.evidenceRefs, integrityStatus: "unverified" as const, supportStatus: "stale" as const }]
       : change.operation === "delete" ? item.claims.filter(({ id }) => id !== change.targetClaimId)
-        : item.claims.map((claim) => claim.id === change.targetClaimId ? { ...claim, text: change.text, evidenceRefs: change.evidenceRefs, integrityStatus: "unverified" as const, supportStatus: "stale" as const } : claim),
+        : item.claims.map((claim) => claim.id === change.targetClaimId ? { ...claim, text: change.text, evidenceSpans: [], evidenceRefs: change.evidenceRefs, integrityStatus: "unverified" as const, supportStatus: "stale" as const } : claim),
   });
   return draftDocumentSchema.parse({ ...draft, sections: changed });
 }
@@ -25,11 +25,12 @@ export function applyFindingSuggestion(draft: DraftDocument, snapshot: SourceSna
 export function refreshDraftSources(result: DraftResponse, snapshot: SourceSnapshot): DraftResponse {
   if (result.snapshot.caseId !== snapshot.caseId) throw new Error("Källversionen hör till ett annat fall.");
   const mapping = new Map<string, string>();
-  for (const origin of ["consultation", "clinician_assessment", "clinician_decision"] as const) {
+  for (const origin of ["consultation", "clinician_assessment", "clinician_decision", "reference_material"] as const) {
     const old = result.snapshot.passages.filter((passage) => passage.origin === origin);
     const current = snapshot.passages.filter((passage) => passage.origin === origin);
     old.forEach((passage, index) => {
-      const target = origin === "clinician_decision" ? current.find((item) => item.decisionField === passage.decisionField) : current[index];
+      const target = passage.materialId ? current.find((item) => item.materialId === passage.materialId && item.id.split(":").at(-1) === passage.id.split(":").at(-1))
+        : origin === "clinician_decision" ? current.find((item) => item.decisionField === passage.decisionField) : current.filter((item) => !item.materialId)[index];
       if (target?.text === passage.text) mapping.set(passage.id, target.id);
     });
   }

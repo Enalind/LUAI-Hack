@@ -1,5 +1,47 @@
 # Test report
 
+## CP6 — 21 November 2026
+
+Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, unchanged Next.js 16.4.6 / AI SDK 7.0.179 / Anthropic provider 4.0.107. Package manifests now pin Node `24.x` for reproducible Vercel selection. All routine tests used mocks/stub transports. Exactly six live evaluation requests were made separately, with no retries or repeated probe.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm test` | PASSED; 16 files, 216 tests (13 new CP6 cases), 597 ms. |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; all 29 Chromium checks in 9.9 seconds, explicit mock mode and empty key. |
+| `VERCEL=1 AI_MODE=mock npm run build` | PASSED, using a synthetic key marker; all routes and bundled brand assets/fonts compiled. |
+| Production mock startup and API | PASSED; simulated hosted runtime, HTTP page/health/draft response, health `CP6`/`mock`, generated fictional D1 draft mode `mock`. |
+| Frontend isolation | PASSED; 15 public build files plus page/health/draft responses contained zero synthetic credential marker hits. `.env` and `.local/held-out-observations.json` confirmed ignored. This is a targeted check, not an exhaustive security audit. |
+| `npm run eval:live` | COMPLETED/PASSED contracts; 1 explicit test, 124.71 seconds, three cases, six HTTP requests, zero retries. Separate source-comparison limitations are in the evaluation report. |
+| Visual/keyboard QA | PASSED; fresh desktop 1280 px and narrow 375 px screenshots inspected, source focus/highlight, gaps, findings, panel tabs and keyboard acceptance. In-app browser host remains unavailable; Playwright QA was completed independently. |
+| `git diff --check` | PASSED. Original product/implementation plans, raw imported research fixtures and live prompts preserved; only the lockfile's root Node engine constraint changed. |
+
+New deterministic checks exercise the evaluation's fixed call count, skipped review after draft failure, retained failures/unknown usage, invalid evidence rejection, masked unknown errors, case-limit rejection and frozen-prompt mismatch before model execution. Hosted tests verify explicit mock works with no key and that missing/live Vercel modes return safe configuration errors before any provider fetch, including when a synthetic key exists. The health route now uses the same relative server import convention as other route modules so its real configuration behavior can be tested directly.
+
+The browser suite includes complete journey A (source-supported accept → stale → recheck → exact copy, desktop/narrow), B (source supplement → deterministic refresh/recheck retaining manual wording, no replacement draft request), and the new combined C (timeout → explicit successful retry → delayed review/edit → older response ignored). A new acceptance check clicks every generated source chip in D1–D3 and asserts exact passage text/focus/highlight. Existing case isolation, missing inputs, clipboard confirmation/fallback and JSON-report checks remain passing.
+
+Live evaluation metadata: `claude-sonnet-5-5`, frozen `swedish-draft-v1` / `swedish-review-v1`, H1–H3 authored after prompt freeze. All three drafts/reviews passed contract validation; 15/15 draft references and 13/13 review/proposal references matched, all 15 decision-field comparisons unchanged. Provider-reported totals: 23,875 input / 12,365 output / 36,240 total tokens; 3,677 reasoning tokens are included in output. No extra model calls were made to fix or retest quality misses. See [EVALUATION_REPORT.md](EVALUATION_REPORT.md) for attribution/fact/gap metrics, rubric limitations and implementation-agent adjudication.
+
+No real Vercel deployment or independent human/clinical review was performed. Public deployment is configured as mock-only and rejects hosted live mode; actual platform provisioning/protection remains unverified. No real patient data or certificate transmission was used.
+
+## Asteria identity follow-up — 21 November 2026
+
+CP5 commit `eda0d5e` was merged with two incoming research-fixture commits and pushed as `bb6ac55` before branding began. The merge passed all 203 deterministic tests (14 files). Branding changes are frontend/assets/docs only, with no dependency or live-prompt changes.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; all 27 mock Chromium workflow tests, 6.3 seconds. No provider key or real model calls. |
+| `npm run build` | PASSED; local variable fonts, supplied SVG icon and all existing dynamic routes compiled successfully. |
+| Visual/keyboard QA | Existing desktop and 375 px screenshots inspected: Asteria wordmark, serif headings, warm palette, source highlighting, findings, controls and responsive tabs are readable. Existing keyboard and full editing/export journeys passed. |
+| Production preview | PASSED; page, outlined wordmark and static ICO returned HTTP 200; health reported `CP5` / `mock`. |
+| User-facing preview handoff | NOT VERIFIED; the in-app browser access host was unavailable. Playwright browser QA and production HTTP checks were completed independently. |
+| `git diff --check` | PASSED. |
+
+The first browser-suite launch encountered an already-running local development server; it was not interrupted. The later run passed after that server stopped. The kit's ICO cannot be decoded by Next's file-based image processor because its embedded PNG is not RGBA; serving the unchanged ICO from `public/` and using the supplied SVG as the app icon resolved the compilation error. Font files and complete SIL OFL licenses are bundled locally. No product/research plan, medical source text or clinician decision was rewritten by this UI update. Zero live model calls; no deployment or certificate transmission.
+
 ## CP5 — 21 November 2026
 
 Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6; unchanged dependencies and live prompt versions. **Zero live draft calls and zero live review calls.** Browser tests force mock mode and an empty provider key; provider transport tests use stubs.
@@ -146,3 +188,38 @@ The production servers were stopped after verification. Screenshots are temporar
 `test:e2e:ui` is configured but the interactive runner was NOT RUN. `eval:live` deliberately exits with an explicit NOT RUN message until the later evaluation implementation; no live model smoke test or evaluation has occurred. npm emitted an ESLint 9 support deprecation notice during installation; the pinned Next.js-compatible linter completed successfully.
 
 Mock shell checks do not establish drafting, review, or live model quality.
+
+## Hover references and longer development examples — 21 November 2026
+
+- `npm test`: 226 tests in 19 files passed. Includes exact citations from the longer transcripts and journal notes, valid diagnosis codes, and canonical JSON example checks.
+- `npm run test:e2e`: 34 Chromium checks passed. Text hover, Alt+Down, Escape, touch access, every prepared citation opening its exact passage, manual edits, stale review, source supplementation, clipboard recovery and reports are covered.
+- `npm run build`: passed, including TypeScript. Desktop and narrow screenshots inspected.
+- Visible citation rows were removed from the draft and findings. Source previews float above the document and allow opening the original passage. Examples are loaded through the server layout; the client receives the validated case data.
+- D1–D3 now have 58–65 timestamped turns, about 1,300–1,400 words each, two dated journal notes per case, and clinician-selected M54.5 or M54.2 codes. Prepared mock wording and exact source references were updated together.
+- Frozen H1–H3 and their answer keys were unchanged. No live model call or new clinical validation was performed. Historical live results do not validate these updated examples.
+
+## Live draft token-limit regression — 21 November 2026
+
+The user-reported format failure was reproduced on the long fictional D1 example: the live provider stopped at 6,000 output tokens (`max_tokens`) with incomplete JSON. Increased the shared per-step output cap to 12,000, set low effort for draft formatting only, and mapped token-limit parsing failures to an explicit length-limit error. Review retains its default reasoning effort; strict schema and citation validation remain enabled.
+
+- Full deterministic suite: 227 tests passed. A focused rerun of the final draft/review transport changes passed all 49 checks.
+- Production build and TypeScript: passed.
+- Live verification: the same D1 example passed in 26,619 ms with 14 claims, 20 exact references and unchanged clinician decisions; 14,282 input / 3,844 output tokens. No retry, live review or held-out evaluation.
+- Safe local diagnostic reports contain finish reasons, counts and schema issue paths only; source/model prose and credentials are not retained.
+
+## Phrase-level sources and review marks — 21 November 2026
+
+- 239 deterministic tests passed across 20 files. New coverage includes exact/repeated Unicode phrases, source-index bounds, overlapping source/review ranges, unchanged document text, unresolved-anchor rejection, and missing or mismatched live annotations.
+- All 34 previous browser journeys passed. Two added phrase-specific checks passed: a phrase opens only its own sources, and a missing-information field heading explains itself on hover. Native editing/copy/export and stale-result guards still pass. Browser tests now use `.next-e2e` so a running user development server can remain active.
+- Production build/typecheck passed. Desktop/narrow phrase previews inspected visually.
+- Live D1 draft and review probes passed with the new schemas; the draft had 8 claims/12 references and exact anchor alignment, and review detected the deliberate omission with 5 findings/1 phrase target. The first live draft and review attempts also failed validation; those failures were retained as failures and not presented as evidence of quality. No automatic retries were added.
+- Frozen held-out cases and answer keys were unchanged; no new held-out or clinical evaluation was performed.
+
+
+## FK guidance follow-up — 21 November 2026
+
+Added `fk7804-2026-11-21.v1`, a seven-rule curated summary of official FK instructions for narrative fields 3, 5, 6 and 7. Both live system prompts include the pinned rules. Live review requires complete per-rule accounting, applicable allowlisted finding rule IDs and questions for unassessable rules. Server validation rejects inconsistent output; independent source/empty-field checks remain. Hover popups and finding details resolve requirements and official source links from application-owned data. Metadata/review history record the guidance version. Mock examples demonstrate links without claiming semantic FK review.
+
+The existing clinician diagnosis is read-only draft context for DFA continuity; all decisions remain application-controlled. Draft v5 writes text parts once and derives highlights, removing the duplicate-phrase mismatch caught by the first live draft probe. Review uses explicit medium effort after the initial default-effort timeout. Scope and source maintenance are documented in [FK_GUIDANCE.md](FK_GUIDANCE.md).
+
+Verification: 258 unit/integration tests, all 39 Chromium workflows, lint, typecheck, production build and whitespace checks passed. Final live draft passed in 22,015 ms; final guided omission review passed in 14,422 ms with all seven checks and the expected omission detected. Four explicit live probes were made, including the initial timeout and anchor-validation failure; no automatic retries. New prompts have no independent clinical validation or rerun held-out evaluation. No deployment or certificate transmission occurred.

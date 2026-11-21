@@ -17,6 +17,13 @@ export function buildSourcePassages(snapshotId: string, input: SourceInput): Sou
   };
   append(input.consultationText, "consultation");
   append(input.clinicianAssessmentText, "clinician_assessment");
+  for (const material of input.referenceMaterials ?? []) {
+    segmentSourceText(material.text).forEach((line, index) => passages.push({
+      id: `${snapshotId}:material:${material.id}:${index + 1}`,
+      origin: material.type === "assessment" ? "clinician_assessment" : material.type === "consultation" ? "consultation" : "reference_material",
+      text: line, decisionField: null, materialId: material.id, materialTitle: material.title, materialType: material.type,
+    }));
+  }
   for (const field of DECISION_FIELDS) {
     const value = input.explicitDecision[field];
     if (value === null || (typeof value === "string" && !value.trim())) continue;

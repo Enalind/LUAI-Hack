@@ -1,0 +1,17 @@
+{
+  "id": "H1",
+  "label": "Biblioteksarbete – dokumenterat underlag",
+  "adequate": true,
+  "input": {
+    "consultationText": "Patienten: Jag arbetar som bibliotekarie, sorterar böcker vid ett bord och lyfter boklådor som väger cirka 2 kg.\nPatienten: Jag får ont i höger handled när jag greppar en bok och behöver då pausa sorteringen.\nPatienten: Jag har inte domningar i handen.",
+    "clinicianAssessmentText": "Vid dagens undersökning noterar läkaren smärta i höger handled vid aktiv böjning; ingen annan undersökning dokumenteras här.\nLäkaren bedömer, utifrån den dokumenterade rörelsesmärtan och patientens beskrivning, att smärta vid handgrepp för närvarande begränsar sortering av böcker och lyft av boklådor på cirka 2 kg.\nPlan: arbetsterapeutisk bedömning är bokad den 26 november 2026 och läkaruppföljning den 3 december 2026.",
+    "explicitDecision": {
+      "diagnosisText": "Handledssmärta, preliminär bedömning",
+      "diagnosisCode": null,
+      "leaveExtent": 25,
+      "startDate": "2026-11-21",
+      "endDate": "2026-12-03"
+    },
+    "sourceRevision": 0
+  }
+}

@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-import { developmentCases } from "../../fixtures/development/cases";
+import { emptySourceInput } from "../../lib/workspace-state";
 import { validateEvidenceReferences } from "../../lib/evidence";
 import { sourceSnapshotSchema } from "../../lib/schemas";
 import { segmentSourceText } from "../../lib/sources";
 import { createSourceSnapshot, validateSourceSnapshot } from "../../lib/server/source-snapshot";
 
 describe("source snapshots and reference integrity", () => {
-  const original = developmentCases[1].input;
+  const original = { ...emptySourceInput(), consultationText: "Patient: Jag har haft värk i nacken i två veckor.\nPatient: Jag sover sämre när det gör ont." };
 
   it("segments exact Swedish lines without trimming or merging identical passages", () => {
     const text = "  Patient: Återkommande smärta.  \r\n\r\nPatient: Ömhet.\nPatient: Ömhet.\rFråga: När?\n";

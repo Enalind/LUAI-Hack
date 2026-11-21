@@ -1,0 +1,8 @@
+{
+  "frozenAt": "2026-11-21T12:58:40.245400+00:00",
+  "promptFile": "lib/server/prompts.ts",
+  "sha256": "9ff8c7e5c1d64ae2889058ed0b59528a0059b7fabac663fff488563b31bd81fc",
+  "draftVersion": "swedish-draft-v1",
+  "reviewVersion": "swedish-review-v1",
+  "note": "Frozen before authoring held-out fixtures; no tuning during the evaluation."
+}

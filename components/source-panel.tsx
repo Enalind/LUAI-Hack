@@ -6,6 +6,7 @@ const origins = [
   ["consultation", "Besöksunderlag"],
   ["clinician_assessment", "Läkarens bedömning"],
   ["clinician_decision", "Läkarens beslut"],
+  ["reference_material", "Referensmaterial"],
 ] as const;
 const decisionLabels = { diagnosisText: "Diagnos", diagnosisCode: "Diagnoskod", leaveExtent: "Sjukskrivningsgrad", startDate: "Från och med", endDate: "Till och med" };
 
@@ -24,7 +25,7 @@ export function SourcePanel({ snapshot, selectedSourceId, stale }: { snapshot: S
               const number = snapshot.passages.findIndex(({ id }) => id === passage.id) + 1;
               const selected = selectedSourceId === passage.id;
               return <article id={passage.id} key={passage.id} tabIndex={-1} className={`source-passage ${selected ? "selected-source" : ""}`} aria-label={`Källa ${number}: ${title}`}>
-                <div className="source-passage-heading"><strong>Källa {number}</strong>{selected && <span className="selected-label">Vald källa</span>}</div>
+                <div className="source-passage-heading"><strong>Källa {number}{passage.materialTitle && ` · ${passage.materialTitle}`}</strong>{selected && <span className="selected-label">Vald källa</span>}</div>
                 {passage.decisionField && <span className="input-help">{decisionLabels[passage.decisionField]}</span>}
                 <p>{passage.text}</p>
               </article>;

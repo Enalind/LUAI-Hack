@@ -17,6 +17,10 @@ type ServerConfig =
 
 /** Read at request time; never serialize this object to the browser. */
 export function getServerConfig(env: Environment = process.env): ServerConfig {
+  // This prototype's hosted demo is mock-only. No unprotected paid endpoint.
+  if (env.VERCEL === "1" && env.AI_MODE !== "mock") {
+    throw new ConfigurationError("Vercel-demot kräver AI_MODE=mock. Live-läge är endast tillgängligt lokalt.");
+  }
   const result = modeSchema.safeParse(env.AI_MODE ?? "mock");
   if (!result.success) {
     throw new ConfigurationError("AI_MODE måste vara mock eller live.");

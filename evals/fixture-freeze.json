@@ -1,0 +1,9 @@
+{
+  "createdAfterPromptFreeze": true,
+  "files": {
+    "fixtures/held-out/H1.json": "11231f8b8db2ba9cfe1b827036a5048a12fe3416324357b1e9739b6a6ae92c66",
+    "fixtures/held-out/H2.json": "094544355c01c82d4a41f19a1f22c818d47d088cf6e1403e9d7087a83bd9d9b0",
+    "fixtures/held-out/H3.json": "1192e4df97515c21a922367b504c8d95e220acb8305b9ee57d33541ddb3e2d81",
+    "fixtures/held-out/answer-keys.json": "c84e17700ed6997918929913a0c5355ff7c1b08287b9f927779b059766b233c0"
+  }
+}

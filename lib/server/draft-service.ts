@@ -7,6 +7,7 @@ import type { CertificateProvider } from "./provider";
 import { validateDraftOutput } from "./provider-output";
 import { readJsonRequest } from "./request-body";
 import { createSourceSnapshot } from "./source-snapshot";
+import { validateDiagnosisCode } from "./diagnosis-codes";
 
 /** Validate before selecting or calling any provider. Injection is server/test-only. */
 export function createDraftHandler(providerFactory: () => CertificateProvider = getCertificateProvider) {
@@ -16,6 +17,7 @@ export function createDraftHandler(providerFactory: () => CertificateProvider = 
     try {
       const input = await readJsonRequest(request, draftRequestSchema);
       requestId = input.requestId;
+      validateDiagnosisCode(input.input.explicitDecision.diagnosisCode);
       const snapshot = createSourceSnapshot(input.caseId, input.input);
       const output = await providerFactory().draft(snapshot, { signal: request.signal });
       const validated = validateDraftOutput(snapshot, output);

@@ -90,7 +90,7 @@ export function workspaceReducer(state: WorkspaceState, action: WorkspaceAction)
           ...state.result,
           draft: { ...state.result.draft, sections: state.result.draft.sections.map((section) => ({
             ...section, claims: section.claims.map((claim) => claim.id === action.claimId
-              ? { ...claim, text: action.text, integrityStatus: "unverified", supportStatus: "stale" } : claim),
+              ? { ...claim, text: action.text, evidenceSpans: [], integrityStatus: "unverified", supportStatus: "stale" } : claim),
           })) },
         },
       };

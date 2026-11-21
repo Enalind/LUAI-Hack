@@ -32,7 +32,7 @@ describe("POST /api/draft", () => {
 
   it.each([
     {},
-    { ...validBody, input: { ...validBody.input, consultationText: " ", clinicianAssessmentText: "\n" } },
+    { ...validBody, input: { ...validBody.input, consultationText: " ", clinicianAssessmentText: "\n", referenceMaterials: [] } },
     { ...validBody, input: { ...validBody.input, consultationText: "x".repeat(30_001) } },
     { ...validBody, input: { ...validBody.input, explicitDecision: { ...validBody.input.explicitDecision, leaveExtent: 60 } } },
     { ...validBody, input: { ...validBody.input, explicitDecision: { ...validBody.input.explicitDecision, startDate: "2026-02-30" } } },
@@ -104,6 +104,7 @@ describe("POST /api/draft", () => {
     expect(response.status).toBe(200);
     const body = draftResponseSchema.parse(await response.json());
     expect(body.validationFindings).toHaveLength(1);
-    expect(body.draft.sections[0].claims[0]).toMatchObject({ integrityStatus: "invalid", evidenceRefs: [] });
+    expect(body.draft.sections[0].claims[0].integrityStatus).toBe("invalid");
+    expect(body.draft.sections[0].claims[0].evidenceRefs).not.toEqual(expect.arrayContaining([expect.objectContaining({ sourceId: "source-from-another-case" })]));
   });
 });

@@ -4,6 +4,9 @@ import { useState } from "react";
 import type { ScopedDisposition, DraftResponse, Finding, ReviewResult } from "../lib/schemas";
 import type { getReviewStatus } from "../lib/workspace-state";
 import { validateEvidenceReferences } from "../lib/evidence";
+import { EvidenceHover } from "./evidence-reference";
+import { FkGuidanceReference } from "./fk-guidance-reference";
+import { FK_GUIDANCE_SOURCE, FK_GUIDANCE_VERSION, FK_GUIDANCE_VERIFIED_ON } from "../lib/fk-guidance";
 
 const categories = { work_tasks: "Arbetsuppgifter och krav", work_relationship: "Samband med arbetet", assessment_basis: "Bedömningsgrund och attribution", support_and_contradictions: "Källstöd och motsägelser" };
 const actions = { available_but_missing: "Finns i källan men saknas i utkastet", source_information_missing: "Information saknas i underlaget", unsupported_or_conflicting: "Källstöd eller formulering behöver granskas", unclear: "Behöver förtydligas" };
@@ -24,11 +27,12 @@ export function FindingsPanel({ draft, review, previousReview, status, error, ca
       const claim = draft?.draft.sections.flatMap(({ claims }) => claims).find(({ id }) => id === finding.targetClaimId);
       const refs = draft ? validateEvidenceReferences([...finding.evidenceRefs, ...(finding.proposedChange?.evidenceRefs ?? [])], draft.snapshot).validRefs : [];
       const uniqueRefs = refs.filter((ref, index) => refs.findIndex((other) => other.sourceId === ref.sourceId && other.exactQuote === ref.exactQuote) === index);
-      return <article className={`finding-card ${old ? "old-finding" : ""}`} key={finding.id} aria-label={`Fynd: ${categories[finding.category]}`}>
+      return <article className={`finding-card ${finding.actionType === "unsupported_or_conflicting" ? "conflict-finding" : ""} ${old ? "old-finding" : ""}`} key={finding.id} id={`finding-${finding.id}`} tabIndex={-1} aria-label={`Fynd: ${categories[finding.category]}`}>
         <div className="finding-heading"><span className="finding-priority">{finding.priority === "needs_review" ? "Behöver granskas" : "Förtydligande"}</span><span>Fält {finding.fieldId}</span></div>
         <h3>{categories[finding.category]}</h3><p className="finding-type">{actions[finding.actionType]}</p>
         {old && <p className="needs-attention">Tidigare fynd – kontrollera mot aktuell version.</p>}
-        <p>{finding.explanation}</p>
+        <EvidenceHover references={uniqueRefs} snapshot={draft!.snapshot} label="för granskningsfynd" onSource={onSource}><p className="finding-explanation" tabIndex={uniqueRefs.length ? 0 : undefined}>{finding.explanation}</p></EvidenceHover>
+        <FkGuidanceReference ruleIds={finding.guidelineRuleIds} />
         {claim && <button type="button" className="text-button" onClick={() => onClaim(claim.id)}>Gå till berört påstående</button>}
         {finding.question && <div className="finding-question"><strong>Fråga till läkaren</strong><p>{finding.question}</p><button type="button" className="text-button" onClick={onQuestion}>Komplettera underlaget</button></div>}
         {finding.proposedChange && <div className="proposed-change"><strong>Förslag: {operations[finding.proposedChange.operation]}</strong>
@@ -42,17 +46,14 @@ export function FindingsPanel({ draft, review, previousReview, status, error, ca
           {finding.proposedChange && <button type="button" className="secondary-button" disabled={!actionable} onClick={() => onDisposition(finding.id, "accepted", notes[finding.id] ?? "")}>Acceptera förslag</button>}{" "}
           <button type="button" className="text-button" disabled={!actionable} onClick={() => onDisposition(finding.id, "dismissed", notes[finding.id] ?? "")}>Avfärda fynd</button>
         </div>}
-        <div className="evidence-buttons">{uniqueRefs.map((ref, index) => {
-          const number = draft!.snapshot.passages.findIndex(({ id }) => id === ref.sourceId) + 1;
-          return <button type="button" className="source-chip" key={`${ref.sourceId}-${index}`} onClick={() => onSource(ref.sourceId)} aria-label={`Visa källa ${number} för granskningsfynd`}>Källa {number}</button>;
-        })}</div>
+
       </article>;
     });
   }
   const incomplete = status === "incomplete" || (status === "loading" && review?.completionStatus === "incomplete");
   return <>
     <div className="panel-heading"><h2 id="review-title">Granskning</h2><span className="tag">{status === "complete" ? "Kontroll genomförd" : status === "stale" ? "Inaktuell" : status === "incomplete" ? "Ofullständig" : status === "loading" ? "Pågår" : "Ej körd"}</span></div>
-    <p className="panel-description">Kontroll av källhänvisningar och innehåll i fyra kategorier.</p>
+    <p className="panel-description">Kontroll av källstöd och intygsinnehåll mot Försäkringskassans vägledning för fält 3, 5, 6 och 7.</p>
     <button type="button" className="primary-button" disabled={!canReview || status === "loading"} onClick={onReview}>
       {status === "loading" ? "Granskar utkast…" : status === "incomplete" ? "Försök granska igen" : review ? "Granska på nytt" : "Granska utkast"}
     </button>
@@ -64,6 +65,10 @@ export function FindingsPanel({ draft, review, previousReview, status, error, ca
     {incomplete && <div className="error" role="alert" aria-label="Granskningsfel"><strong>Granskningen är ofullständig</strong><p>{error ?? review?.error?.message ?? "Kontrollen kunde inte slutföras."}</p><p>Intygstexten finns kvar. Eventuella kodkontroller och tidigare fynd visas nedan.</p></div>}
     {status === "complete" && review?.findings.length === 0 && <p className="review-empty-result">Inga problem identifierades av kontrollen.</p>}
     {review && <p className="input-help">{review.completionStatus === "complete" ? `${review.findings.length} fynd. ` : "Kodkontroller för denna version. "}{review.metadata?.mode === "mock" ? "Förberedd mock-kontroll." : review.metadata?.mode === "live" ? "Modellassisterad kontroll." : "Modellkontrollen slutfördes inte."}</p>}
+    {review?.metadata?.guidanceVersion === FK_GUIDANCE_VERSION && review.guidelineChecks && <p className="input-help guidance-version" data-guidance-version={review.metadata.guidanceVersion}>
+      {review.guidelineChecks.length} vägledningsområden genomgångna. <a href={FK_GUIDANCE_SOURCE} target="_blank" rel="noopener noreferrer">FK:s intygsvägledning ↗</a> · Källan kontrollerad {FK_GUIDANCE_VERIFIED_ON}. Avser dessa fyra fält, inte en fullständig intygsprövning.
+    </p>}
+    {review?.metadata?.mode === "mock" && <p className="input-help">Vägledningslänkarna visas i ett förberett exempel; ingen modellbedömning mot vägledningen har utförts.</p>}
     {review && cards(review.findings, status === "stale" || (status === "incomplete" && review.completionStatus === "complete"))}
     {previousReview && <section aria-label="Tidigare granskningsfynd"><h3>Tidigare granskningsfynd</h3>{cards(previousReview.findings, true, previousReview.requestId)}</section>}
     {status === "idle" && !!draft?.validationFindings.length && <div className="integrity-findings" role="alert"><h3>Källhänvisningar behöver kontrolleras</h3>{cards(draft.validationFindings)}</div>}

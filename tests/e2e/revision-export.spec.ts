@@ -1,12 +1,10 @@
+import { openPanel, selectCase, showClaimSources } from "./workflow-helpers";
 import { expect, test, type Page } from "@playwright/test";
 
-async function openPanel(page: Page, name: string) {
-  const tab = page.getByRole("tab", { name, exact: true });
-  if (await tab.count()) await tab.click();
-}
+
 async function draft(page: Page, id = "D1") {
   await page.goto("/");
-  await page.getByLabel("Välj fiktivt exempel").selectOption(id);
+  await selectCase(page, id);
   await page.getByRole("button", { name: "Skapa intygsutkast", exact: true }).click();
   await expect(page.getByRole("status", { name: "Utkaststatus" })).toContainText("Utkast skapat");
 }
@@ -42,8 +40,9 @@ for (const narrow of [false, true]) test(`accept addition → recheck → clean 
     await route.fulfill({ response, json: body });
   });
   await draft(page);
-  await page.getByRole("button", { name: "Visa källa 1 för påstående 1 i Sysselsättning", exact: true }).click();
-  await expect(page.getByRole("article", { name: "Källa 1: Besöksunderlag", exact: true })).toBeFocused();
+  await showClaimSources(page, "Påstående 1 · Sysselsättning");
+  await page.getByRole("dialog").getByRole("button", { name: /Visa källa.*för påstående 1 i Sysselsättning/ }).first().click();
+  await expect(page.locator(".selected-source")).toBeFocused();
   await review(page);
   const accept = page.getByRole("button", { name: "Acceptera förslag", exact: true });
   await accept.focus(); await accept.press("Enter");
@@ -75,6 +74,7 @@ test("clinician supplement → source refresh preserves manual draft → accept 
   await expect(page.getByRole("region", { name: "Läkarens beslut i källversionen" })).toContainText("Ej angiven");
   const manual = "Läkarens egen formulering om patientens nackvärk.";
   await page.getByLabel("Påstående 1 · Funktionsnedsättning").fill(manual);
+  await openPanel(page, "Underlag");
   await page.getByLabel("Läkarens komplettering", { exact: true }).fill("Patienten arbetar med bokföring vid dator.");
   await page.getByRole("button", { name: "Lägg till i underlaget", exact: true }).click();
   await review(page);
@@ -88,7 +88,7 @@ test("clinician supplement → source refresh preserves manual draft → accept 
   await expect(page.getByRole("article", { name: "Fynd: Arbetsuppgifter och krav", exact: true })).toHaveCount(0);
   await expect(page.getByLabel("Påstående 1 · Funktionsnedsättning")).toHaveValue(manual);
   const data = await report(page);
-  expect(Object.values(data.explicitDecision)).toEqual([null, null, null, null, null]);
+  expect(data.explicitDecision).toEqual({ diagnosisText: "Cervikalgi", diagnosisCode: "M54.2", leaveExtent: null, startDate: null, endDate: null });
   expect(data.dispositions[0].status).toBe("accepted");
   expect(data.sourceSnapshots).toHaveLength(2);
 });
@@ -141,6 +141,7 @@ test("an incomplete review requires explicit copy confirmation and exports curre
     await route.fulfill({ json: { requestId, sourceRevision, draftRevision, completionStatus: "incomplete", metadata: null, findings: [],
       error: { requestId, code: "REQUEST_TIMEOUT", message: "Tidsgräns.", retryable: true } } });
   });
+  await openPanel(page, "Granskning");
   await page.getByRole("button", { name: "Granska utkast", exact: true }).click();
   await expect(page.getByRole("alert", { name: "Granskningsfel" })).toBeVisible();
   await page.getByRole("button", { name: "Kopiera fält 3", exact: true }).click();
@@ -164,8 +165,10 @@ test("a late uncancellable source refresh cannot start review after a manual edi
   page.on("request", (request) => { if (request.url().endsWith("/api/review")) reviews++; });
   await page.route("**/api/sources", async (route) => { const response = await route.fetch(); began(); await gate; await route.fulfill({ response }); });
   await draft(page, "D2");
+  await openPanel(page, "Underlag");
   await page.getByLabel("Läkarens komplettering", { exact: true }).fill("Arbetar vid dator.");
   await page.getByRole("button", { name: "Lägg till i underlaget", exact: true }).click();
+  await openPanel(page, "Granskning");
   await page.getByRole("button", { name: "Granska utkast", exact: true }).click(); await started;
   await page.getByLabel("Påstående 1 · Funktionsnedsättning").fill("Nyare manuell text.");
   const arrived = page.waitForResponse((response) => response.url().endsWith("/api/sources"));

@@ -6,6 +6,8 @@ import {
 import { validateEvidenceReferences } from "../evidence";
 import { ApplicationError } from "./errors";
 import { validateSourceSnapshot } from "./source-snapshot";
+import { resolveTextSpan, validEvidenceSpans } from "../text-annotations";
+import { FK_GUIDANCE_VERSION, FK_RULE_IDS, getFkRule } from "../fk-guidance";
 
 function invalidOutput(): never {
   throw new ApplicationError("INVALID_MODEL_OUTPUT", "Modellsvaret kunde inte valideras. Försök igen eller kontrollera underlaget.", 502);
@@ -15,10 +17,12 @@ export function validateDraftOutput(snapshotValue: SourceSnapshot, raw: unknown)
   const snapshot = validateSourceSnapshot(snapshotValue);
   const result = providerDraftOutputSchema.safeParse(raw);
   if (!result.success) invalidOutput();
+  if (result.data.metadata.mode === "live" && result.data.metadata.guidanceVersion !== FK_GUIDANCE_VERSION) invalidOutput();
   const validationFindings: Finding[] = [];
   const sections = result.data.sections.map((section) => ({
     ...section,
     claims: section.claims.map((claim, claimIndex) => {
+      if (claim.evidenceSpans && !validEvidenceSpans(claim.text, claim.evidenceRefs.length, claim.evidenceSpans)) invalidOutput();
       const { validRefs, issues } = validateEvidenceReferences(claim.evidenceRefs, snapshot);
       const missing = claim.evidenceRefs.length === 0;
       if (missing || issues.length) {
@@ -32,6 +36,13 @@ export function validateDraftOutput(snapshotValue: SourceSnapshot, raw: unknown)
       }
       return {
         ...claim, evidenceRefs: validRefs,
+        ...(claim.evidenceSpans ? { evidenceSpans: claim.evidenceSpans.flatMap((span) => {
+          const referenceIndices = span.referenceIndices.flatMap((oldIndex) => {
+            if (issues.some((issue) => issue.index === oldIndex)) return [];
+            return [oldIndex - issues.filter((issue) => issue.index < oldIndex).length];
+          });
+          return referenceIndices.length ? [{ ...span, referenceIndices }] : [];
+        }) } : {}),
         integrityStatus: missing ? "missing" as const : issues.length ? "invalid" as const : "valid" as const,
         supportStatus: missing || issues.length ? "needs_review" as const : "unreviewed" as const,
       };
@@ -51,9 +62,23 @@ export function validateReviewOutput(snapshotValue: SourceSnapshot, draftValue: 
   const draft = draftDocumentSchema.parse(draftValue);
   const result = providerReviewOutputSchema.safeParse(raw);
   if (!result.success) invalidOutput();
+  const { guidelineChecks, metadata } = result.data;
+  if (metadata.mode === "live" && (metadata.guidanceVersion !== FK_GUIDANCE_VERSION || !guidelineChecks)) invalidOutput();
+  if (guidelineChecks) {
+    if (new Set(guidelineChecks.map(({ ruleId }) => ruleId)).size !== FK_RULE_IDS.length) invalidOutput();
+    for (const check of guidelineChecks) {
+      const linked = result.data.findings.filter((finding) => finding.guidelineRuleIds?.includes(check.ruleId));
+      if ((check.status === "no_issue_identified") !== (linked.length === 0)) invalidOutput();
+      if (check.status === "not_assessable" && !linked.some((finding) => finding.question && finding.proposedChange === null)) invalidOutput();
+    }
+  }
   const claims = new Map(draft.sections.flatMap((section) => section.claims.map((claim) => [claim.id, claim] as const)));
   for (const finding of result.data.findings) {
+    if (metadata.mode === "live" && !finding.guidelineRuleIds?.length) invalidOutput();
+    if (finding.guidelineRuleIds && (new Set(finding.guidelineRuleIds).size !== finding.guidelineRuleIds.length
+      || finding.guidelineRuleIds.some((id) => !getFkRule(id).fields.some((field) => field === finding.fieldId)))) invalidOutput();
     if (finding.targetClaimId !== null && claims.get(finding.targetClaimId)?.fieldId !== finding.fieldId) invalidOutput();
+    if (finding.targetSpan && (!finding.targetClaimId || !resolveTextSpan(claims.get(finding.targetClaimId)!.text, finding.targetSpan))) invalidOutput();
     if (validateEvidenceReferences(finding.evidenceRefs, snapshot).issues.length) invalidOutput();
     const change = finding.proposedChange;
     if (change && validateEvidenceReferences(change.evidenceRefs, snapshot).issues.length) invalidOutput();

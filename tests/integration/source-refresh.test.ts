@@ -33,7 +33,7 @@ describe("source refresh without draft generation", () => {
 
   it.each(["blank", "revision", "oversize", "decision"])("rejects invalid %s input before provider selection", async (fault) => {
     const body = input();
-    if (fault === "blank") body.input.consultationText = "   ";
+    if (fault === "blank") { body.input.consultationText = "   "; body.input.referenceMaterials = []; }
     if (fault === "revision") body.sourceRevision = 99;
     if (fault === "oversize") body.input.clinicianAssessmentText = "x".repeat(30001);
     if (fault === "decision") Object.assign(body.input.explicitDecision, { leaveExtent: 80 });

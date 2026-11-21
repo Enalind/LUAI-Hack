@@ -101,7 +101,7 @@ describe("clinician revisions and clean export", () => {
     const snapshot = createSourceSnapshot(state.caseId, input);
     const updated = refreshDraftSources(state.result!, snapshot);
     expect(updated.draft.sections[1].claims[0]).toMatchObject({ text: "Min egen formulering.", supportStatus: "stale", integrityStatus: "unverified" });
-    expect(updated.draft.sections[1].claims[0].evidenceRefs[0].sourceId).toBe(snapshot.passages[0].id);
+    expect(updated.draft.sections[1].claims[0].evidenceRefs[0].sourceId).toBe(snapshot.passages.find((passage) => passage.text.includes("Jag har haft värk i nacken i två veckor."))!.id);
     expect(updated.draft.explicitDecision).toEqual(input.explicitDecision);
     const changed = createSourceSnapshot(state.caseId, { ...input, consultationText: "Ny första passage." });
     expect(refreshDraftSources(state.result!, changed).draft.sections[1].claims[0].evidenceRefs).toEqual(state.result!.draft.sections[1].claims[0].evidenceRefs);

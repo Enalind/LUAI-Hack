@@ -1,17 +1,20 @@
 import { expect, test } from "@playwright/test";
 
-test("mock shell renders without a provider key", async ({ page, request }) => {
-  const health = await request.get("/api/health");
-  expect(health.ok()).toBeTruthy();
-  expect(await health.json()).toEqual({ status: "ok", mode: "mock", checkpoint: "CP5" });
+test("mock dashboard starts on material collection and exposes separate workflow pages", async ({ page, request }) => {
+  expect((await request.get("/api/health")).ok()).toBeTruthy();
   await page.goto("/");
   await expect(page.getByText("Prototyp – endast fiktiva patientfall")).toBeVisible();
   await expect(page.getByText("Mock-läge · ingen modellanslutning")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Intygsutkast", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Granskning", exact: true })).toBeVisible();
-  await expect(page.getByText("Underlag saknas", { exact: true })).toHaveCount(4);
+  await expect(page.getByRole("heading", { name: "Referensmaterial", exact: true })).toBeVisible();
+  await expect(page.locator("#panel-draft")).toBeHidden();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Till innehållet" })).toBeFocused();
+  await page.getByRole("link", { name: "Intygsutkast", exact: true }).click();
+  await expect(page).toHaveURL(/\/utkast$/);
+  await expect(page.getByText("Ditt utkast får plats här.")).toBeVisible();
+  await page.getByRole("link", { name: "Granskning", exact: true }).click();
+  await expect(page).toHaveURL(/\/granskning$/);
+  await expect(page.getByRole("button", { name: "Granska utkast", exact: true })).toBeDisabled();
 });
 
 test("shell remains readable on a narrow screen", async ({ page }) => {

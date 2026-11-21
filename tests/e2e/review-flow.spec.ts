@@ -1,15 +1,13 @@
+import { openPanel, selectCase } from "./workflow-helpers";
 import { expect, test, type Page } from "@playwright/test";
 
 async function draft(page: Page, id = "D1") {
   await page.goto("/");
-  await page.getByLabel("Välj fiktivt exempel").selectOption(id);
+  await selectCase(page, id);
   await page.getByRole("button", { name: "Skapa intygsutkast", exact: true }).click();
   await expect(page.getByRole("status", { name: "Utkaststatus" })).toContainText("Utkast skapat · ej granskat");
 }
-async function openReview(page: Page) {
-  const tab = page.getByRole("tab", { name: "Granskning", exact: true });
-  if (await tab.count()) await tab.click();
-}
+async function openReview(page: Page) { await openPanel(page, "Granskning"); }
 async function review(page: Page, name = "Granska utkast") {
   await openReview(page);
   await page.getByRole("button", { name, exact: true }).click();
@@ -56,8 +54,9 @@ test("omitted source-supported work detail receives an inspectable addition with
   await expect(finding).toContainText("Förslag: Lägg till");
   await expect(finding).toContainText("10–15 kg");
   await expect(page.getByRole("region", { name: "Sysselsättning", exact: true }).getByRole("textbox")).toHaveCount(1);
-  await finding.getByRole("button", { name: "Visa källa 2 för granskningsfynd", exact: true }).click();
-  await expect(page.getByRole("article", { name: "Källa 2: Besöksunderlag", exact: true })).toBeFocused();
+  await finding.locator(".finding-explanation").press("Alt+ArrowDown");
+  await finding.getByRole("dialog").getByRole("button", { name: /Visa källa.*för granskningsfynd/ }).first().click();
+  await expect(page.locator(".selected-source")).toBeFocused();
   await page.screenshot({ path: testInfo.outputPath("review-evidence-desktop.png"), fullPage: true });
 });
 
@@ -83,6 +82,7 @@ test("review failure retains editable text and retry is a separate explicit acti
     await route.fulfill({ json: { requestId, sourceRevision, draftRevision, findings: [], completionStatus: "incomplete", metadata: null,
       error: { requestId, code: "REQUEST_TIMEOUT", message: "Granskningen tog för lång tid.", retryable: true } } });
   });
+  await openPanel(page, "Granskning");
   await page.getByRole("button", { name: "Granska utkast", exact: true }).click();
   await expect(page.getByRole("alert", { name: "Granskningsfel" })).toContainText("Granskningen är ofullständig");
   await expect(page.getByLabel("Påstående 1 · Sysselsättning")).toHaveValue("Min manuella text.");
@@ -111,9 +111,11 @@ test("a replacement draft keeps the prior review visible as stale until rechecke
   await page.getByLabel("Påstående 1 · Sysselsättning").fill("Felaktig arbetsuppgift.");
   await review(page);
   await expect(page.locator(".finding-card")).toHaveCount(1);
+  await openPanel(page, "Underlag");
   await page.getByRole("button", { name: "Ersätt med nytt utkast", exact: true }).click();
   await expect(page.getByLabel("Påstående 1 · Sysselsättning")).toHaveValue(/Patienten uppger/);
   await expect(page.getByRole("status", { name: "Utkaststatus" })).toContainText("granskning inaktuell");
+  await openPanel(page, "Granskning");
   await expect(page.locator(".finding-card")).toHaveCount(1);
   await review(page, "Granska på nytt");
   await expect(page.locator(".finding-card")).toHaveCount(0);
@@ -132,6 +134,7 @@ test("an older uncancellable review cannot replace a manual edit or appear curre
     const response = await route.fetch(); began(); await gate; await route.fulfill({ response });
   });
   await draft(page);
+  await openPanel(page, "Granskning");
   await page.getByRole("button", { name: "Granska utkast", exact: true }).click();
   await started;
   await expect(page.getByRole("status", { name: "Granskningsstatus" })).toContainText("Granskar utkast…");
@@ -148,11 +151,54 @@ test("narrow review tabs allow questions and source completion navigation", asyn
   await page.setViewportSize({ width: 375, height: 812 });
   await draft(page, "D2");
   await review(page);
-  await expect(page.getByRole("tabpanel", { name: "Granskning", exact: true })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Granskningsfynd", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("review-narrow.png"), fullPage: true });
   const finding = page.getByRole("article", { name: "Fynd: Arbetsuppgifter och krav", exact: true });
   await finding.getByRole("button", { name: "Komplettera underlaget" }).click();
-  await expect(page.getByRole("tab", { name: "Underlag", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("link", { name: "Underlag", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(page.getByLabel("Läkarens bedömning", { exact: true })).toBeFocused();
+});
+
+test("CP6 journey C: review timeout, explicit retry, then editing defeats a delayed older recheck", async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = window.fetch;
+    window.fetch = (input, init) => original(input, input === "/api/review" ? { ...init, signal: undefined } : init);
+  });
+  let attempts = 0, release!: () => void, began!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  const started = new Promise<void>((resolve) => { began = resolve; });
+  await page.route("**/api/review", async (route) => {
+    attempts++;
+    if (attempts === 1) {
+      const context = route.request().postDataJSON();
+      await route.fulfill({ json: { requestId: context.requestId, sourceRevision: context.sourceRevision, draftRevision: context.draftRevision,
+        completionStatus: "incomplete", findings: [], metadata: null,
+        error: { requestId: context.requestId, code: "REQUEST_TIMEOUT", message: "Granskningen tog för lång tid.", retryable: true } } });
+      return;
+    }
+    const response = await route.fetch();
+    if (attempts === 3) { began(); await gate; }
+    await route.fulfill({ response });
+  });
+  await draft(page, "D3");
+  const claim = page.getByLabel("Påstående 1 · Funktionsnedsättning");
+  const original = await claim.inputValue();
+  await openPanel(page, "Granskning");
+  await page.getByRole("button", { name: "Granska utkast", exact: true }).click();
+  await expect(page.getByRole("alert", { name: "Granskningsfel" })).toBeVisible();
+  await expect(claim).toHaveValue(original);
+  expect(attempts).toBe(1);
+  await review(page, "Försök granska igen");
+  expect(attempts).toBe(2);
+  await expect(page.getByRole("alert", { name: "Granskningsfel" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Granska på nytt", exact: true }).click(); await started;
+  await claim.fill("Läkarens nya manuella formulering efter genomgång.");
+  const arrived = page.waitForResponse((response) => response.url().endsWith("/api/review"));
+  release(); await (await arrived).finished();
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await expect(claim).toHaveValue("Läkarens nya manuella formulering efter genomgång.");
+  await expect(page.getByRole("status", { name: "Utkaststatus" })).toContainText("granskning inaktuell");
+  await expect(page.getByRole("button", { name: "Avfärda fynd", exact: true }).first()).toBeDisabled();
+  expect(attempts).toBe(3);
 });
