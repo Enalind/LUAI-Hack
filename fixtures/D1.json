@@ -1,0 +1,77 @@
+{
+  "id": "D1",
+  "split": "development",
+  "title": "Low back pain – warehouse order picker",
+  "scenario": "Adequate sources. (a) Generate a draft: it should contain the concrete work duties and keep patient reports attributed. (b) Review the corrupted draft, which reduces the duties to 'works in a warehouse': the review should recover the detail from the sources.",
+  "sources": [
+    { "id": "T1", "type": "transcript", "speaker": "Doctor", "text": "So, what happened?" },
+    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "I felt something go in my back on Monday when I was lifting a box at work. It's been really painful in my lower back ever since." },
+    { "id": "T3", "type": "transcript", "speaker": "Doctor", "text": "Does the pain go down into your legs?" },
+    { "id": "T4", "type": "transcript", "speaker": "Patient", "text": "No, it's mostly just in my lower back. No numbness." },
+    { "id": "T5", "type": "transcript", "speaker": "Doctor", "text": "What do you do for work?" },
+    { "id": "T6", "type": "transcript", "speaker": "Patient", "text": "I'm an order picker at a warehouse. I'm lifting boxes most of the day, anything from five to twenty kilos." },
+    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "I'm on my feet walking a lot as well, and I'm constantly bending down to the bottom shelves." },
+    { "id": "T8", "type": "transcript", "speaker": "Doctor", "text": "Have you tried working since it happened?" },
+    { "id": "T9", "type": "transcript", "speaker": "Patient", "text": "I tried on Tuesday, but I had to stop after a few minutes because of the pain." },
+    { "id": "T10", "type": "transcript", "speaker": "Patient", "text": "Sitting is okay for a while, and I can manage short walks." },
+    { "id": "T11", "type": "transcript", "speaker": "Doctor", "text": "Are there any lighter duties you could do at work?" },
+    { "id": "T12", "type": "transcript", "speaker": "Patient", "text": "Not really. Everyone in the warehouse picks orders. There's no office work." },
+    { "id": "K1", "type": "clinician", "label": "Examination findings", "text": "Reduced lumbar range of motion; forward flexion limited to approximately 30 degrees by pain. Paravertebral tenderness at L3–L5. Neurological examination normal; straight leg raise negative bilaterally." },
+    { "id": "K2", "type": "clinician", "label": "Functional impairment", "text": "Pain-related reduction in lumbar mobility and load tolerance." },
+    { "id": "K3", "type": "clinician", "label": "Assessment of work capacity", "text": "The patient is currently unable to perform repeated lifting or work in a forward-bent position. Work as an order picker consists mainly of lifting 5–20 kg and bending, and is therefore assessed as not possible during this period. The assessment is based on the examination findings and the patient's description of the job." }
+  ],
+  "clinician_decisions": {
+    "diagnosis": "Low back pain (M54.5)",
+    "sick_leave_extent_percent": 100,
+    "period_start": "2026-11-16",
+    "period_end": "2026-11-29"
+  },
+  "expected_facts": [
+    { "section": "work_tasks", "fact": "Order picker at a warehouse", "source_ids": ["T6"] },
+    { "section": "work_tasks", "fact": "Lifts boxes of 5–20 kg for most of the day", "source_ids": ["T6"] },
+    { "section": "work_tasks", "fact": "Walks a lot and bends repeatedly to low shelves", "source_ids": ["T7"] },
+    { "section": "work_tasks", "fact": "No lighter duties are available", "source_ids": ["T12"] },
+    { "section": "functional_impairment", "fact": "Pain-related reduction in lumbar mobility and load tolerance", "source_ids": ["K2"] },
+    { "section": "activity_limitation", "fact": "Unable to perform repeated lifting or forward-bent work, which the job mainly consists of", "source_ids": ["K3"] },
+    { "section": "assessment_basis", "fact": "Examination findings stated as findings", "source_ids": ["K1"] },
+    { "section": "assessment_basis", "fact": "Onset, absence of radiation and the failed work attempt stated as patient-reported", "source_ids": ["T2", "T4", "T9"] }
+  ],
+  "forbidden_inferences": [
+    "Radiating leg pain, numbness or any neurological deficit.",
+    "Any sick-leave extent or period other than the clinician's decision.",
+    "Presenting the failed work attempt (T9) as something the doctor observed.",
+    "Rehabilitation or return-to-work plans that are not in the sources."
+  ],
+  "corrupted_draft": {
+    "sections": [
+      { "key": "work_tasks", "claims": [
+        { "id": "C1", "text": "The patient works in a warehouse.", "source_ids": ["T6"] }
+      ]},
+      { "key": "functional_impairment", "claims": [
+        { "id": "C2", "text": "Pain-related reduction in lumbar mobility and load tolerance.", "source_ids": ["K2"] }
+      ]},
+      { "key": "activity_limitation", "claims": [
+        { "id": "C3", "text": "The patient is currently unable to perform repeated lifting or work in a forward-bent position, which the job mainly consists of.", "source_ids": ["K3"] },
+        { "id": "C4", "text": "The patient reports having had to stop an attempt to work after a few minutes because of pain.", "source_ids": ["T9"] }
+      ]},
+      { "key": "assessment_basis", "claims": [
+        { "id": "C5", "text": "On examination, lumbar range of motion is reduced, with forward flexion limited to approximately 30 degrees by pain, and there is paravertebral tenderness at L3–L5. Neurological examination is normal.", "source_ids": ["K1"] },
+        { "id": "C6", "text": "The patient reports sudden onset of lower back pain on Monday while lifting a box at work, with no radiation to the legs and no numbness.", "source_ids": ["T2", "T4"] }
+      ]}
+    ]
+  },
+  "expected_findings": [
+    {
+      "check": "A",
+      "target_claim_id": "C1",
+      "gap_type": "omitted_from_draft",
+      "description": "The work duties are vague. The sources describe them concretely: order picker, lifting 5–20 kg for most of the day, frequent bending to low shelves, and no lighter duties available.",
+      "source_ids": ["T6", "T7", "T12"],
+      "acceptable_suggestion": "The patient works as an order picker at a warehouse, lifting boxes of 5–20 kg for most of the working day, walking a lot and repeatedly bending down to low shelves. No lighter duties are available at the workplace."
+    }
+  ],
+  "must_not_flag": [
+    "C5 and C6: findings and patient reports are already correctly separated.",
+    "The clinician decisions (100 %, 2026-11-16 to 2026-11-29)."
+  ]
+}
