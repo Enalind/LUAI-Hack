@@ -7,7 +7,7 @@ export function GET() {
   const requestId = crypto.randomUUID();
   try {
     const { mode } = getServerConfig();
-    return Response.json({ status: "ok", mode, checkpoint: "CP0" }, {
+    return Response.json({ status: "ok", mode, checkpoint: "CP2" }, {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {

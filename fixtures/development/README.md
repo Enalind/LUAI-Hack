@@ -2,6 +2,8 @@
 
 D1–D3 are entirely fictional Swedish development cases. `answer-keys.ts` contains independently written expected facts, forbidden inferences, findings and unchanged clinician decisions. The mock provider does not import these answer keys. The rubric is developer-authored and has not been clinically validated.
 
+The active app/mock fixtures are `cases.ts` and `answer-keys.ts`. The separate `D1.json`, `D2.json`, `D3.json` and `../OVERVIEW.md` were imported from origin and are preserved as an English development case pack. Their D1–D3 identifiers overlap with the Swedish set but their clinical details differ; they are not wired into the prepared provider, and no evaluation result for that pack is claimed.
+
 - D1 includes occupation, lifting demands, attributed patient symptoms, explicit clinician reasoning and planned treatment. Tests remove duties and reasoning from a copy of the draft to exercise source-supported additions.
 - D2 deliberately omits occupation, tasks, assessment and decisions. Review should ask focused questions without supplying those facts.
 - D3 distinguishes a patient's denial from an unanswered doctor's question. Tests corrupt the denial and add a false examination finding to check review contracts.

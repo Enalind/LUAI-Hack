@@ -1,8 +1,10 @@
 # Evaluation report
 
-21 November 2026 · CP0–CP1
+21 November 2026 · CP0–CP2
 
 Live evaluation: NOT RUN. No model integration or prompts exist, no live credentials are needed and no billable requests have been made.
+
+CP2 exposes the prepared Swedish drafts through a validated route and browser workspace. All three development cases passed browser draft-flow checks; this is software evidence only. The English JSON case pack pulled from origin is preserved but not wired into the mock provider and has no reported evaluation result. Neither development set is held out.
 
 CP1 adds three fictional development cases, D1–D3, with independently authored answer keys in `fixtures/development/answer-keys.ts`. The mock implementation does not import those keys. H1–H3 held-out cases remain unwritten and unused; no held-out quality result is claimed. The rubric is developer-authored and not clinically validated.
 

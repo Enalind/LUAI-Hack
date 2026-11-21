@@ -1,5 +1,27 @@
 # Test report
 
+## CP2 — 21 November 2026
+
+Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6. Browser tests run an automatically launched mock development server with an empty provider key. Live-mode handler tests use only an empty or synthetic test key and make no external requests.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm test` | PASSED; 7 files, 103 tests, 227 ms in the final run. Includes 14 draft-handler cases and 7 workspace state tests added in CP2. |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; 11 Chromium tests in 3.5 seconds, including the 2 existing shell checks. |
+| `npm run build` | PASSED; production build includes dynamic Node.js `/`, `/api/draft` and `/api/health` routes. |
+| Visual inspection | Desktop 1280px and narrow 375px screenshots: readable panels, focused/highlighted source passage, tabs, no horizontal overflow. Raw source hashes were removed from the primary display; IDs remain in the returned snapshot and passage DOM IDs. |
+| `git diff --check` | PASSED. Original planning documents and imported JSON/overview fixtures remain unchanged. |
+
+Draft handler integration checks exercise the actual exported POST handler and its injected server-only factory: valid D1–D3 requests return the original snapshot and clinician decisions; invalid/malformed/oversized input invokes no provider; live mode fails clearly with/without a key and never falls back; unknown provider errors are masked; unsupported mock text fails explicitly; invalid citations produce integrity findings and no usable citation reference.
+
+Workspace tests verify case clearing, discarded late responses after case/source changes, manual editing during regeneration, request-ID ordering when revisions match, duplicate-response rejection, wrong-case rejection and preservation of draft text on failure. Browser tests cover all three fictional examples, separate clinician decisions, exact decision wording/partial nulls, editable cards, evidence selection/focus, missing-source questions, case switching, loading/failure/retry, retained edits after failed regeneration, validation before network submission, narrow tabs and keyboard navigation. Delayed-response ordering is verified in reducer tests; this checkpoint does not claim the CP6 full review journeys.
+
+Initial browser checks found ambiguous test locators because Next.js also renders a route-announcer alert. Application errors now have distinct accessible names; all final checks pass. The browser tests required approved local process/network access as in CP0. Screenshots live in ignored `test-results/`; browser test servers stop automatically.
+
+Live model smoke/evaluation: NOT RUN. Review endpoint/workflow, suggestion application, field copy/report export and CP6 acceptance remain unimplemented. No measured clinical quality or provider latency is inferred from these tests.
+
 ## CP1 — 21 November 2026
 
 Environment: macOS arm64, Node 24.22.3 LTS via the temporary runtime noted below, npm 11.18.0, no provider credentials or model calls.
