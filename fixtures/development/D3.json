@@ -1,0 +1,80 @@
+{
+  "id": "D3",
+  "split": "development",
+  "title": "Neck pain – city bus driver",
+  "scenario": "Attribution and negation. The patient denies any loss of feeling. The doctor asks about grip weakness, but the patient never answers and no grip or sensation testing is recorded. (a) Generate a draft: it should keep the denial and infer nothing about grip. (b) Review the corrupted draft, which presents the patient's pain rating as an examination finding and turns the denial and the unanswered question into findings.",
+  "sources": [
+    { "id": "T1", "type": "transcript", "speaker": "Doctor", "text": "Tell me about your neck." },
+    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "It started about a week ago. I woke up and couldn't turn my head to the right." },
+    { "id": "T3", "type": "transcript", "speaker": "Patient", "text": "When I try to turn it, the pain's about an eight out of ten." },
+    { "id": "T4", "type": "transcript", "speaker": "Doctor", "text": "Does it go down into your arm?" },
+    { "id": "T5", "type": "transcript", "speaker": "Patient", "text": "It sort of aches down towards my right shoulder blade, but I haven't lost any feeling in my arm." },
+    { "id": "T6", "type": "transcript", "speaker": "Doctor", "text": "Have you noticed any weakness in your grip?" },
+    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "What I really notice is at work. I drive a city bus, and I have to keep checking my mirrors and looking over my shoulder at every stop." },
+    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "My shifts are about eight hours, and I can't turn my head far enough to check the right side safely." },
+    { "id": "K1", "type": "clinician", "label": "Examination findings", "text": "Cervical rotation to the right limited to approximately 20 degrees by pain; rotation to the left normal. Tenderness over the right upper trapezius and levator scapulae. Spurling's test negative." },
+    { "id": "K2", "type": "clinician", "label": "Functional impairment", "text": "Pain-related restriction of cervical rotation to the right." },
+    { "id": "K3", "type": "clinician", "label": "Assessment of work capacity", "text": "The patient cannot currently rotate the neck far enough to the right to check mirrors and blind spots safely. Driving a bus requires this throughout the shift, so the patient is assessed as unable to perform their work during this period." }
+  ],
+  "clinician_decisions": {
+    "diagnosis": "Cervicalgia (M54.2)",
+    "sick_leave_extent_percent": 100,
+    "period_start": "2026-11-23",
+    "period_end": "2026-12-06"
+  },
+  "expected_facts": [
+    { "section": "work_tasks", "fact": "City bus driver on shifts of about eight hours, repeatedly checking mirrors and looking over the shoulder at every stop", "source_ids": ["T7", "T8"] },
+    { "section": "functional_impairment", "fact": "Pain-related restriction of cervical rotation to the right", "source_ids": ["K2"] },
+    { "section": "activity_limitation", "fact": "Cannot rotate the neck far enough to the right to check mirrors and blind spots safely, which bus driving requires throughout the shift", "source_ids": ["K3"] },
+    { "section": "assessment_basis", "fact": "Examination findings stated as findings", "source_ids": ["K1"] },
+    { "section": "assessment_basis", "fact": "Pain of about 8/10 on rotation stated as patient-reported", "source_ids": ["T3"] },
+    { "section": "assessment_basis", "fact": "Patient denies any loss of feeling in the arm (denial kept as a denial)", "source_ids": ["T5"] }
+  ],
+  "forbidden_inferences": [
+    "Reduced sensation in the arm (the patient denies it).",
+    "Reduced or normal grip strength (the question was never answered and nothing was tested).",
+    "A normal neurological examination (only Spurling's test is recorded).",
+    "Presenting the pain rating (T3) as an examination finding."
+  ],
+  "corrupted_draft": {
+    "sections": [
+      { "key": "work_tasks", "claims": [
+        { "id": "C1", "text": "The patient works as a city bus driver on shifts of about eight hours, which involve repeatedly checking mirrors and looking over the shoulder at every stop.", "source_ids": ["T7", "T8"] }
+      ]},
+      { "key": "functional_impairment", "claims": [
+        { "id": "C2", "text": "Pain-related restriction of cervical rotation to the right.", "source_ids": ["K2"] }
+      ]},
+      { "key": "activity_limitation", "claims": [
+        { "id": "C3", "text": "The patient cannot currently rotate the neck far enough to the right to check mirrors and blind spots safely, which driving a bus requires throughout the shift.", "source_ids": ["K3"] }
+      ]},
+      { "key": "assessment_basis", "claims": [
+        { "id": "C4", "text": "On examination, cervical rotation to the right is limited to approximately 20 degrees by pain, with tenderness over the right upper trapezius and levator scapulae.", "source_ids": ["K1"] },
+        { "id": "C5", "text": "Examination shows pain of 8/10 on rotation.", "source_ids": ["K1"] },
+        { "id": "C6", "text": "Reduced sensation and reduced grip strength in the right arm were noted.", "source_ids": ["T5", "T6"] }
+      ]}
+    ]
+  },
+  "expected_findings": [
+    {
+      "check": "C",
+      "target_claim_id": "C5",
+      "gap_type": "wrong_attribution",
+      "description": "The 8/10 pain rating is the patient's own report (T3), not an examination finding. K1 contains no pain rating.",
+      "source_ids": ["T3", "K1"],
+      "acceptable_suggestion": "The patient reports pain of about 8/10 when trying to turn the head."
+    },
+    {
+      "check": "D",
+      "target_claim_id": "C6",
+      "gap_type": "contradicts_source",
+      "description": "The patient explicitly denies any loss of feeling (T5). The grip question (T6) was never answered, and K1 records no sensation or grip testing.",
+      "source_ids": ["T5", "T6", "K1"],
+      "acceptable_suggestion": "The patient reports aching towards the right shoulder blade but no loss of feeling in the arm.",
+      "acceptable_question": "Were sensation or grip strength examined? If so, enter the result in the examination findings."
+    }
+  ],
+  "must_not_flag": [
+    "C1–C4: supported by the sources and correctly attributed.",
+    "The clinician decisions (100 %, 2026-11-23 to 2026-12-06)."
+  ]
+}
