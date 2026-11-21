@@ -4,18 +4,141 @@
   "title": "Nacksmärta – stadsbussförare",
   "scenario": "Attribution och negation. Patienten förnekar känselbortfall. Läkaren frågar om svaghet i greppet, men patienten svarar aldrig och ingen känsel- eller greppkraftsundersökning finns dokumenterad. (a) Generera utkast: förnekandet ska behållas och inget ska antas om greppet. (b) Granska det korrupta utkastet, som framställer patientens smärtskattning som ett undersökningsfynd och gör förnekandet och den obesvarade frågan till fynd.",
   "sources": [
-    { "id": "T1", "type": "transcript", "speaker": "Läkare", "text": "Berätta om nacken." },
-    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "Det började för ungefär en vecka sedan. Jag vaknade och kunde inte vrida huvudet åt höger." },
-    { "id": "T3", "type": "transcript", "speaker": "Patient", "text": "När jag försöker vrida det är smärtan ungefär en åtta av tio." },
-    { "id": "T4", "type": "transcript", "speaker": "Läkare", "text": "Strålar det ut i armen?" },
-    { "id": "T5", "type": "transcript", "speaker": "Patient", "text": "Det värker liksom ner mot höger skulderblad, men jag har inte tappat någon känsel i armen." },
-    { "id": "T6", "type": "transcript", "speaker": "Läkare", "text": "Har du märkt någon svaghet i greppet?" },
-    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "Det jag verkligen märker är på jobbet. Jag kör stadsbuss och måste hela tiden kolla speglarna och titta över axeln vid varje hållplats." },
-    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "Mina pass är ungefär åtta timmar, och jag kan inte vrida huvudet tillräckligt för att kolla höger sida säkert." },
-    { "id": "K1", "type": "clinician", "label": "Undersökningsfynd", "text": "Rotation av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta; rotation åt vänster normal. Ömhet över höger övre trapezius och levator scapulae. Spurlings test negativt." },
-    { "id": "K2", "type": "clinician", "label": "Funktionsnedsättning", "text": "Smärtrelaterat inskränkt rotation av halsryggen åt höger." },
-    { "id": "K3", "type": "clinician", "label": "Bedömning av arbetsförmåga", "text": "Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln. Arbete som bussförare kräver detta under hela arbetspasset, och patienten bedöms därför inte kunna utföra sitt arbete under perioden." }
+    {
+      "id": "T1",
+      "type": "transcript",
+      "speaker": "Läkare",
+      "text": "Berätta om nacken."
+    },
+    {
+      "id": "T2",
+      "type": "transcript",
+      "speaker": "Patient",
+      "text": "Det började för ungefär en vecka sedan. Jag vaknade och kunde inte vrida huvudet åt höger."
+    },
+    {
+      "id": "T3",
+      "type": "transcript",
+      "speaker": "Patient",
+      "text": "När jag försöker vrida det är smärtan ungefär en åtta av tio."
+    },
+    {
+      "id": "T4",
+      "type": "transcript",
+      "speaker": "Läkare",
+      "text": "Strålar det ut i armen?"
+    },
+    {
+      "id": "T5",
+      "type": "transcript",
+      "speaker": "Patient",
+      "text": "Det värker liksom ner mot höger skulderblad, men jag har inte tappat någon känsel i armen."
+    },
+    {
+      "id": "T6",
+      "type": "transcript",
+      "speaker": "Läkare",
+      "text": "Har du märkt någon svaghet i greppet?"
+    },
+    {
+      "id": "T7",
+      "type": "transcript",
+      "speaker": "Patient",
+      "text": "Det jag verkligen märker är på jobbet. Jag kör stadsbuss och måste hela tiden kolla speglarna och titta över axeln vid varje hållplats."
+    },
+    {
+      "id": "T8",
+      "type": "transcript",
+      "speaker": "Patient",
+      "text": "Mina pass är ungefär åtta timmar, och jag kan inte vrida huvudet tillräckligt för att kolla höger sida säkert."
+    },
+    {
+      "id": "J1",
+      "type": "journal",
+      "entry_id": "E1",
+      "date": "2026-03-02",
+      "author_role": "Läkare",
+      "heading": "Status",
+      "text": "Syn och hörsel utan anmärkning. Neurologstatus utan anmärkning."
+    },
+    {
+      "id": "J2",
+      "type": "journal",
+      "entry_id": "E1",
+      "date": "2026-03-02",
+      "author_role": "Läkare",
+      "heading": "Bedömning",
+      "text": "Inga medicinska hinder för fortsatt behörighet."
+    },
+    {
+      "id": "J3",
+      "type": "journal",
+      "entry_id": "E2",
+      "date": "2026-11-20",
+      "author_role": "Läkare",
+      "heading": "Anamnes",
+      "text": "Vaknade för en vecka sedan med smärta i nacken och svårt att vrida huvudet åt höger. Uppger smärta 8/10 vid rotation. Värk ner mot höger skulderblad, förnekar känselbortfall i armen. Arbetar som stadsbussförare."
+    },
+    {
+      "id": "J4",
+      "type": "journal",
+      "entry_id": "E2",
+      "date": "2026-11-20",
+      "author_role": "Läkare",
+      "heading": "Status",
+      "text": "Rotation av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta; rotation åt vänster normal. Ömhet över höger övre trapezius och levator scapulae. Spurlings test negativt."
+    },
+    {
+      "id": "J5",
+      "type": "journal",
+      "entry_id": "E2",
+      "date": "2026-11-20",
+      "author_role": "Läkare",
+      "heading": "Bedömning",
+      "text": "Cervikalgi. Smärtrelaterat inskränkt rotation av halsryggen åt höger. Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln. Arbete som bussförare kräver detta under hela arbetspasset, och patienten bedöms därför inte kunna utföra sitt arbete under perioden."
+    },
+    {
+      "id": "J6",
+      "type": "journal",
+      "entry_id": "E2",
+      "date": "2026-11-20",
+      "author_role": "Läkare",
+      "heading": "Åtgärd",
+      "text": "Rörelseträning och analgetika vid behov. Läkarintyg för sjukpenning. Återbesök om två veckor."
+    }
   ],
+  "journal_entries": [
+    {
+      "entry_id": "E1",
+      "date": "2026-03-02",
+      "contact_type": "Besök",
+      "care_unit": "Vårdcentralen Norrdal",
+      "author_role": "Läkare",
+      "contact_reason": "Läkarintyg för körkortsbehörighet D (buss)",
+      "note_ids": [
+        "J1",
+        "J2"
+      ]
+    },
+    {
+      "entry_id": "E2",
+      "date": "2026-11-20",
+      "contact_type": "Besök",
+      "care_unit": "Vårdcentralen Norrdal",
+      "author_role": "Läkare",
+      "contact_reason": "Nacksmärta",
+      "note_ids": [
+        "J3",
+        "J4",
+        "J5",
+        "J6"
+      ]
+    }
+  ],
+  "input_text": {
+    "transcript": "Läkare: Berätta om nacken.\nPatient: Det började för ungefär en vecka sedan. Jag vaknade och kunde inte vrida huvudet åt höger.\nPatient: När jag försöker vrida det är smärtan ungefär en åtta av tio.\nLäkare: Strålar det ut i armen?\nPatient: Det värker liksom ner mot höger skulderblad, men jag har inte tappat någon känsel i armen.\nLäkare: Har du märkt någon svaghet i greppet?\nPatient: Det jag verkligen märker är på jobbet. Jag kör stadsbuss och måste hela tiden kolla speglarna och titta över axeln vid varje hållplats.\nPatient: Mina pass är ungefär åtta timmar, och jag kan inte vrida huvudet tillräckligt för att kolla höger sida säkert.",
+    "journal": "2026-03-02 · Besök · Vårdcentralen Norrdal\nAntecknad av: Läkare\nKontaktorsak: Läkarintyg för körkortsbehörighet D (buss)\nStatus: Syn och hörsel utan anmärkning. Neurologstatus utan anmärkning.\nBedömning: Inga medicinska hinder för fortsatt behörighet.\n\n2026-11-20 · Besök · Vårdcentralen Norrdal\nAntecknad av: Läkare\nKontaktorsak: Nacksmärta\nAnamnes: Vaknade för en vecka sedan med smärta i nacken och svårt att vrida huvudet åt höger. Uppger smärta 8/10 vid rotation. Värk ner mot höger skulderblad, förnekar känselbortfall i armen. Arbetar som stadsbussförare.\nStatus: Rotation av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta; rotation åt vänster normal. Ömhet över höger övre trapezius och levator scapulae. Spurlings test negativt.\nBedömning: Cervikalgi. Smärtrelaterat inskränkt rotation av halsryggen åt höger. Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln. Arbete som bussförare kräver detta under hela arbetspasset, och patienten bedöms därför inte kunna utföra sitt arbete under perioden.\nÅtgärd: Rörelseträning och analgetika vid behov. Läkarintyg för sjukpenning. Återbesök om två veckor."
+  },
   "clinician_decisions": {
     "diagnosis": "Cervikalgi (M54.2)",
     "sick_leave_extent_percent": 100,
@@ -23,35 +146,123 @@
     "period_end": "2026-12-06"
   },
   "expected_facts": [
-    { "section": "work_tasks", "fact": "Stadsbussförare med pass på cirka åtta timmar, kontrollerar upprepade gånger speglar och tittar över axeln vid varje hållplats", "source_ids": ["T7", "T8"] },
-    { "section": "functional_impairment", "fact": "Smärtrelaterat inskränkt rotation av halsryggen åt höger", "source_ids": ["K2"] },
-    { "section": "activity_limitation", "fact": "Kan inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbetet kräver under hela passet", "source_ids": ["K3"] },
-    { "section": "assessment_basis", "fact": "Undersökningsfynden återges som fynd", "source_ids": ["K1"] },
-    { "section": "assessment_basis", "fact": "Smärta cirka 8/10 vid rotation återges som patientens uppgift", "source_ids": ["T3"] },
-    { "section": "assessment_basis", "fact": "Patienten förnekar känselbortfall i armen (förnekandet behålls som förnekande)", "source_ids": ["T5"] }
+    {
+      "section": "work_tasks",
+      "fact": "Stadsbussförare med pass på cirka åtta timmar, kontrollerar upprepade gånger speglar och tittar över axeln vid varje hållplats",
+      "source_ids": [
+        "T7",
+        "T8"
+      ]
+    },
+    {
+      "section": "functional_impairment",
+      "fact": "Smärtrelaterat inskränkt rotation av halsryggen åt höger",
+      "source_ids": [
+        "J5"
+      ]
+    },
+    {
+      "section": "activity_limitation",
+      "fact": "Kan inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbetet kräver under hela passet",
+      "source_ids": [
+        "J5"
+      ]
+    },
+    {
+      "section": "assessment_basis",
+      "fact": "Undersökningsfynden återges som fynd",
+      "source_ids": [
+        "J4"
+      ]
+    },
+    {
+      "section": "assessment_basis",
+      "fact": "Smärta cirka 8/10 vid rotation återges som patientens uppgift",
+      "source_ids": [
+        "T3"
+      ]
+    },
+    {
+      "section": "assessment_basis",
+      "fact": "Patienten förnekar känselbortfall i armen (förnekandet behålls som förnekande)",
+      "source_ids": [
+        "T5"
+      ]
+    }
   ],
   "forbidden_inferences": [
     "Nedsatt känsel i armen (patienten förnekar det).",
     "Nedsatt eller normal greppkraft (frågan besvarades aldrig och inget undersöktes).",
     "Normalt neurologstatus (endast Spurlings test är dokumenterat).",
-    "Att smärtskattningen (T3) framställs som ett undersökningsfynd."
+    "Att smärtskattningen (T3) framställs som ett undersökningsfynd.",
+    "Att neurologstatus från körkortsintyget 2026-03-02 (J1) framställs som ett aktuellt fynd."
   ],
   "corrupted_draft": {
     "sections": [
-      { "key": "work_tasks", "claims": [
-        { "id": "C1", "text": "Patienten arbetar som stadsbussförare med arbetspass på cirka åtta timmar, vilket innebär att upprepade gånger kontrollera speglar och titta över axeln vid varje hållplats.", "source_ids": ["T7", "T8"] }
-      ]},
-      { "key": "functional_impairment", "claims": [
-        { "id": "C2", "text": "Smärtrelaterat inskränkt rotation av halsryggen åt höger.", "source_ids": ["K2"] }
-      ]},
-      { "key": "activity_limitation", "claims": [
-        { "id": "C3", "text": "Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbete som bussförare kräver under hela passet.", "source_ids": ["K3"] }
-      ]},
-      { "key": "assessment_basis", "claims": [
-        { "id": "C4", "text": "Vid undersökning är rotationen av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta, med ömhet över höger övre trapezius och levator scapulae.", "source_ids": ["K1"] },
-        { "id": "C5", "text": "Undersökningen visar smärta 8/10 vid rotation.", "source_ids": ["K1"] },
-        { "id": "C6", "text": "Nedsatt känsel och nedsatt greppkraft i höger arm noterades.", "source_ids": ["T5", "T6"] }
-      ]}
+      {
+        "key": "work_tasks",
+        "claims": [
+          {
+            "id": "C1",
+            "text": "Patienten arbetar som stadsbussförare med arbetspass på cirka åtta timmar, vilket innebär att upprepade gånger kontrollera speglar och titta över axeln vid varje hållplats.",
+            "source_ids": [
+              "T7",
+              "T8"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "functional_impairment",
+        "claims": [
+          {
+            "id": "C2",
+            "text": "Smärtrelaterat inskränkt rotation av halsryggen åt höger.",
+            "source_ids": [
+              "J5"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "activity_limitation",
+        "claims": [
+          {
+            "id": "C3",
+            "text": "Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbete som bussförare kräver under hela passet.",
+            "source_ids": [
+              "J5"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "assessment_basis",
+        "claims": [
+          {
+            "id": "C4",
+            "text": "Vid undersökning är rotationen av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta, med ömhet över höger övre trapezius och levator scapulae.",
+            "source_ids": [
+              "J4"
+            ]
+          },
+          {
+            "id": "C5",
+            "text": "Undersökningen visar smärta 8/10 vid rotation.",
+            "source_ids": [
+              "J4"
+            ]
+          },
+          {
+            "id": "C6",
+            "text": "Nedsatt känsel och nedsatt greppkraft i höger arm noterades.",
+            "source_ids": [
+              "T5",
+              "T6"
+            ]
+          }
+        ]
+      }
     ]
   },
   "expected_findings": [
@@ -59,22 +270,32 @@
       "check": "C",
       "target_claim_id": "C5",
       "gap_type": "wrong_attribution",
-      "description": "Smärtskattningen 8/10 är patientens egen uppgift (T3), inte ett undersökningsfynd. K1 innehåller ingen smärtskattning.",
-      "source_ids": ["T3", "K1"],
+      "description": "Smärtskattningen 8/10 är patientens egen uppgift (T3, och under Anamnes i J3), inte ett undersökningsfynd. Status (J4) innehåller ingen smärtskattning.",
+      "source_ids": [
+        "T3",
+        "J3",
+        "J4"
+      ],
       "acceptable_suggestion": "Patienten uppger smärta på cirka 8/10 vid försök att vrida huvudet."
     },
     {
       "check": "D",
       "target_claim_id": "C6",
       "gap_type": "contradicts_source",
-      "description": "Patienten förnekar uttryckligen känselbortfall (T5). Frågan om greppkraft (T6) besvarades aldrig, och K1 dokumenterar ingen undersökning av känsel eller greppkraft.",
-      "source_ids": ["T5", "T6", "K1"],
+      "description": "Patienten förnekar uttryckligen känselbortfall (T5, J3). Frågan om greppkraft (T6) besvarades aldrig, och Status (J4) dokumenterar ingen undersökning av känsel eller greppkraft.",
+      "source_ids": [
+        "T5",
+        "T6",
+        "J3",
+        "J4"
+      ],
       "acceptable_suggestion": "Patienten beskriver värk ner mot höger skulderblad men uppger att hen inte har tappat någon känsel i armen.",
       "acceptable_question": "Undersöktes känsel eller greppkraft? Ange i så fall resultatet under undersökningsfynd."
     }
   ],
   "must_not_flag": [
     "C1–C4: stöds av underlaget och är korrekt attribuerade.",
-    "Läkarens beslut (100 %, 2026-11-23 till och med 2026-12-06)."
+    "Läkarens beslut (100 %, 2026-11-23 till och med 2026-12-06).",
+    "Att journalanteckningen 2026-03-02 inte återges: den är inaktuell för bedömningen."
   ]
 }
