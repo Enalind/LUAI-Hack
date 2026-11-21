@@ -36,7 +36,7 @@ test("genuine source gaps show focused questions without invented citations or d
   await expect(finding).toContainText("Information saknas i underlaget");
   await expect(finding).toContainText("Vilket yrke och vilka konkreta arbetsuppgifter");
   await expect(finding.getByRole("button", { name: /Visa källa/ })).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Läkarens beslut vid skapandet" })).toContainText("Ej angiven");
+  await expect(page.getByRole("region", { name: "Läkarens beslut i källversionen" })).toContainText("Ej angiven");
   await finding.getByRole("button", { name: "Komplettera underlaget" }).click();
   await expect(page.getByLabel("Läkarens bedömning", { exact: true })).toBeFocused();
   await expect(page.getByLabel("Läkarens bedömning", { exact: true })).toHaveValue("");

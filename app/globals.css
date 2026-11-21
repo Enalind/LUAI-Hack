@@ -133,3 +133,18 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.3r
 .old-finding { border-style: dashed; background: #f8f9f7; }
 .text-button { padding: .45rem .15rem; border: 0; background: transparent; color: var(--teal); text-decoration: underline; text-underline-offset: .2rem; font-size: .875rem; text-align: left; }
 .review-empty-result { border-left: 3px solid #86aea0; padding: .8rem; font-size: 1rem; background: #f0f5f3; }
+
+/* Clinician revision and explicit export actions. */
+.secondary-button { background: #fff; color: var(--ink); border: 1px solid #9baeb9; border-radius: 6px; padding: .6rem .8rem; font: inherit; cursor: pointer; }
+.secondary-button:hover { background: #edf5f5; }
+.field-export, .report-export { margin-top: 1rem; }
+.copy-confirmation { border: 1px solid #ba913d; background: #fff9e9; padding: .8rem; margin-top: .7rem; border-radius: 6px; }
+.copy-confirmation li { margin-bottom: .4rem; }
+.report-export { border-top: 1px solid #d8e1e5; padding-top: 1rem; }
+.report-export label { display: block; margin-bottom: .7rem; font-size: .85rem; }
+.report-export input[type="checkbox"] { width: auto; margin-right: .4rem; }
+.clinician-addition { min-width: 0; border: 1px solid #d8e1e5; padding: .8rem; margin: 1rem 0; border-radius: 6px; }
+.clinician-addition legend { font-weight: 600; }
+.finding-actions { margin: .8rem 0; }
+.finding-actions input { margin-bottom: .6rem; }
+.disposition-status { border-left: 3px solid #548789; padding-left: .6rem; font-size: .85rem; }

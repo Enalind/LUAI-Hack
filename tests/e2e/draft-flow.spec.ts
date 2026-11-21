@@ -11,7 +11,7 @@ async function loadAndGenerate(page: Page, id = "D1") {
 test("warehouse draft has separate decisions, editable claims and source navigation", async ({ page }, testInfo) => {
   await loadAndGenerate(page);
   await expect(page.getByLabel("Påstående 2 · Sysselsättning")).toHaveValue(/10–15 kg/);
-  const decisions = page.getByRole("region", { name: "Läkarens beslut vid skapandet" });
+  const decisions = page.getByRole("region", { name: "Läkarens beslut i källversionen" });
   await expect(decisions).toContainText("Ländryggssmärta, preliminär bedömning");
   await expect(decisions).toContainText("50 %");
   await expect(decisions).toContainText("2026-12-05");
@@ -37,7 +37,7 @@ test("missing work and assessment information stays missing with explicit questi
   const limitations = page.getByRole("region", { name: "Aktivitetsbegränsning", exact: true });
   await expect(limitations.getByRole("textbox")).toHaveCount(0);
   await expect(limitations).toContainText("Vilka begränsningar bedömer läkaren");
-  const decisions = page.getByRole("region", { name: "Läkarens beslut vid skapandet" });
+  const decisions = page.getByRole("region", { name: "Läkarens beslut i källversionen" });
   await expect(decisions.getByText("Ej angiven", { exact: true })).toHaveCount(3);
   await expect(decisions.getByText("Ej angivet", { exact: true })).toHaveCount(2);
   await expect(page.getByLabel("Påstående 1 · Funktionsnedsättning")).toHaveValue(/^Patienten uppger nackvärk/);
@@ -62,7 +62,7 @@ test("clinician-entered wording and partial leave decisions are passed through u
   await page.getByRole("button", { name: "Skapa intygsutkast", exact: true }).click();
   const body = await (await returned).json();
   expect(body.draft.explicitDecision).toEqual({ diagnosisText: diagnosis, diagnosisCode: null, leaveExtent: 75, startDate: null, endDate: "2026-12-05" });
-  const decisions = page.getByRole("region", { name: "Läkarens beslut vid skapandet" });
+  const decisions = page.getByRole("region", { name: "Läkarens beslut i källversionen" });
   await expect(decisions).toContainText("75 %");
   await expect(decisions).toContainText("Ej säker.");
   await expect(decisions).toContainText("Ej angivet");

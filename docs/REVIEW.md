@@ -1,4 +1,4 @@
-# Review behavior — CP4
+# Review behavior — CP4–CP5
 
 The user starts each review with **Granska utkast** or **Granska på nytt**. There is no automatic review call after generation, edits or failures. A live review makes one model request with no automatic retries. Mock development and browser tests need no model calls.
 
@@ -18,11 +18,11 @@ Exact duplicates collapse, with identity including field, target, action, explan
 
 ## Interface and revisions
 
-Cards show review priority (not medical urgency), field, explanation, question/proposal, and evidence links. Source links focus and highlight the original passage. Target links focus the claim; question links open the source disclosure and focus the assessment input. No edits occur automatically. Accept/dismiss dispositions and applying a proposal are intentionally CP5 work.
+Cards show review priority (not medical urgency), field, explanation, question/proposal, and evidence links. Source links focus and highlight the original passage. Target links focus the claim; question links open the source disclosure and focus the assessment input. No edits occur automatically. Fresh complete reviews expose accept/dismiss actions with optional notes. Accept revalidates the target and citations, changes only its intended claim/section, increments draftRevision and makes the review stale. Dismiss leaves text/support unchanged. Both dispositions retain source/draft revisions and the review request ID; new reviews do not inherit them. Old or pending/incomplete review actions are disabled.
 
 Editing sources, decisions or claims invalidates the relevant pending request; best-effort abort and revision/request guards prevent stale responses from becoming current. Prior findings remain visibly stale, including across replacement drafts, until a complete recheck succeeds. An incomplete recheck retains older findings separately. Failures never replace clinical text. Claim status says only that a check occurred or a finding targets the claim; it never claims medical verification.
 
-A complete empty result says **Inga problem identifierades av kontrollen**. Incomplete/stale checks do not show that empty-success wording. Review has no FK approval semantics. Changed sources require regeneration before review; mock source combinations remain limited to prepared fixtures.
+A complete empty result says **Inga problem identifierades av kontrollen**. Incomplete/stale checks do not show that empty-success wording. Review has no FK approval semantics. Changed sources are refreshed through deterministic `/api/sources` before an explicitly requested review, without draft generation. Unchanged passages at the same source position receive updated references; changed passages keep unusable old references for integrity review. Manual draft text is preserved. Mock source combinations remain limited to prepared fixtures plus explicit field-scoped clinician supplements. See [editing and export](EDITING_EXPORT.md).
 
 ## Minimal live check
 

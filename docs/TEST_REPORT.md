@@ -1,5 +1,27 @@
 # Test report
 
+## CP5 — 21 November 2026
+
+Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6; unchanged dependencies and live prompt versions. **Zero live draft calls and zero live review calls.** Browser tests force mock mode and an empty provider key; provider transport tests use stubs.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm test` | PASSED; 14 files, 203 tests, including 22 new CP5 unit/integration scenarios. |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; 27 Chromium tests, including 7 new CP5 journeys, 6.7 seconds in the final full run. |
+| `npm run build` | PASSED; production routes include deterministic `/api/sources` alongside draft/review/health. Explicit mock mode and an empty provider key were used. |
+| Visual/keyboard inspection | Desktop 1280px and narrow 375px full-cycle screenshots inspected; readable current text, source panel, report controls and per-field copy, no horizontal overflow. Acceptance is exercised with keyboard Enter, and existing keyboard-tab checks pass. |
+| `git diff --check` | PASSED; plans, raw research fixtures and dependency lockfile unchanged. |
+
+New deterministic checks cover add/replace/delete isolation, preserved clinician decisions, review staleness after acceptance, dismissal without verification, per-request disposition scope, disabled stale/pending/incomplete actions, apply-time invalid target/citation/field/ID rejection, source remapping and retained manual text, old source-response ordering, exact current export wording, absent-field placeholders excluded, null decisions, clean-review copy versus confirmation, report source-text exclusion/opt-in, and invalid source-refresh input before any provider selection. Repeated identical clinician additions retain distinct source references.
+
+Browser journeys complete accept → recheck → copy on desktop and narrow viewports; source supplement → refresh/review with manual text preserved and **one original draft request only**; dismissal and continued copy warnings; invalidated copy confirmation after edits; selectable fallback after clipboard rejection; incomplete-review export confirmation; report disposition/history/source inclusion; and a delayed uncancellable source response that cannot start review after manual editing. Existing review timeout/retry and late review-response journeys remain passing.
+
+Initial browser runs exposed that stale proposals were hidden rather than shown disabled. Current-review proposal controls now remain visible and disabled until rechecked. The first new integration run exposed a test fixture mutation; the test input now deep-clones it. Final verification also caught a React sibling-key collision in case-reset handling; the finding panel and report component now use distinct keys and the browser tests assert no duplicate-key errors. The health-check assertion was updated to CP5. Final suites pass. Screenshots and traces are ignored in `test-results/`.
+
+CP5 does not repeat billable probes or make clinical quality claims. The upstream JSON pack was translated to Swedish before this checkpoint and remains separate from the active TypeScript mock fixtures. See [editing/export behavior](EDITING_EXPORT.md) and [evaluation report](EVALUATION_REPORT.md). No deployment or certificate transmission occurred.
+
 ## CP4 — 21 November 2026
 
 Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6 and unchanged AI SDK/provider versions. The user's minimal-call constraint was met: exactly **one live review request**, **zero live draft requests** and **no retries** during CP4. All other checks used mock providers or stub Anthropic transports, never real-key calls.

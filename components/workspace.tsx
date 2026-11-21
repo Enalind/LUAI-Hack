@@ -2,8 +2,10 @@
 
 import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { developmentCases } from "../fixtures/development/cases";
-import { apiErrorSchema, draftResponseSchema, reviewRequestSchema, reviewResultSchema, sourceInputSchema, type RequestContext, type SourceInput } from "../lib/schemas";
+import { apiErrorSchema, draftResponseSchema, reviewRequestSchema, reviewResultSchema, sourceInputSchema, sourceSnapshotResponseSchema, type RequestContext, type SourceInput } from "../lib/schemas";
 import { emptySourceInput, getReviewStatus, initialWorkspaceState, workspaceReducer } from "../lib/workspace-state";
+import { refreshDraftSources } from "../lib/revisions";
+import { ReportDownload } from "./export-controls";
 import { SourceInputForm } from "./source-input";
 import { SourcePanel } from "./source-panel";
 import { CertificateEditor } from "./certificate-editor";
@@ -100,20 +102,35 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
   }
 
   async function review() {
-    if (!state.result || staleSource || state.status === "loading" || mode === null) return;
+    if (!state.result || state.status === "loading" || mode === null) return;
     reviewControllerRef.current?.abort();
     const context: RequestContext = { requestId: crypto.randomUUID(), sourceRevision: state.input.sourceRevision, draftRevision: state.draftRevision };
-    dispatch({ type: "reviewRequested", context });
+    dispatch({ type: staleSource ? "sourcesRequested" : "reviewRequested", context });
     setActiveTab("review");
-    const input = reviewRequestSchema.safeParse({ ...context, snapshot: state.result.snapshot, draft: state.result.draft, explicitDecision: state.input.explicitDecision });
-    if (!input.success) {
-      dispatch({ type: "reviewFailed", context, message: "Kontrollera att alla påståenden innehåller text och att läkarens beslut motsvarar källversionen." });
-      return;
-    }
     const controller = new AbortController();
     reviewControllerRef.current = controller;
     const timer = window.setTimeout(() => controller.abort("timeout"), 70_000);
     try {
+      let result = state.result;
+      if (staleSource) {
+        const response = await fetch("/api/sources", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...context, caseId: state.caseId, input: state.input }), signal: controller.signal });
+        const body: unknown = await response.json();
+        if (controller.signal.aborted) return;
+        const parsed = sourceSnapshotResponseSchema.safeParse(body);
+        if (!response.ok || !parsed.success || parsed.data.requestId !== context.requestId || parsed.data.sourceRevision !== context.sourceRevision
+          || parsed.data.draftRevision !== context.draftRevision || parsed.data.snapshot.caseId !== state.caseId) {
+          dispatch({ type: "reviewFailed", context, message: "Källversionen kunde inte uppdateras. Intygstexten finns kvar." }); return;
+        }
+        result = refreshDraftSources(result, parsed.data.snapshot);
+        dispatch({ type: "sourcesReceived", result: parsed.data });
+        dispatch({ type: "reviewRequested", context });
+      }
+      const input = reviewRequestSchema.safeParse({ ...context, snapshot: result.snapshot, draft: result.draft, explicitDecision: state.input.explicitDecision });
+      if (!input.success) {
+        dispatch({ type: "reviewFailed", context, message: "Kontrollera att alla påståenden innehåller text och att läkarens beslut motsvarar källversionen." }); return;
+      }
+      if (controller.signal.aborted) return;
       const response = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input.data), signal: controller.signal });
       const body: unknown = await response.json();
       const parsed = reviewResultSchema.safeParse(body);
@@ -147,7 +164,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
     </div>
     {configurationError && <div className="error" role="alert" aria-label="Konfigurationsfel"><strong>Generering är inte tillgänglig</strong><p>{configurationError}</p></div>}
     {state.error && <div className="error" role="alert" aria-label="Utkastfel"><strong>Utkastet kunde inte skapas</strong><p>{state.error}</p></div>}
-    {staleSource && <div className="stale-notice" role="note">Underlaget har ändrats. Utkastet och dess källpassager hör till föregående källversion. Skapa ett nytt utkast för att använda ändringarna.</div>}
+    {staleSource && <div className="stale-notice" role="note">Underlaget har ändrats. Utkastet och dess källpassager hör till föregående källversion. Välj Granska för att uppdatera källversionen och behålla dina redigeringar.</div>}
 
     {narrow && <div className="workspace-tabs" role="tablist" aria-label="Arbetsytans paneler">{tabs.map((tab, index) => <button
       key={tab.id} id={`tab-${tab.id}`} type="button" role="tab" aria-selected={activeTab === tab.id}
@@ -161,7 +178,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
       <section className="panel source-panel" {...panelProps("source")}>
         <div className="panel-heading"><h2 id="source-title">Underlag</h2><span className="tag">Fiktivt fall</span></div>
         <p className="panel-description">Besöksunderlag och läkarens bedömning hålls åtskilda.</p>
-        <SourceInputForm caseId={state.caseId} input={state.input} busy={state.status === "loading"} hasDraft={!!state.result}
+        <SourceInputForm key={state.caseId} caseId={state.caseId} input={state.input} busy={state.status === "loading"} hasDraft={!!state.result}
           generationAvailable={mode !== null} mode={mode} onCaseChange={changeCase} onChange={changeSource} onGenerate={generate} />
         <SourcePanel snapshot={state.result?.snapshot ?? null} selectedSourceId={selection?.id ?? null} stale={staleSource} />
       </section>
@@ -169,15 +186,17 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
         <div className="panel-heading"><h2 id="draft-title">Intygsutkast</h2><span className="tag">{state.result ? reviewStatus === "complete" ? "Kontroll genomförd" : "Behöver granskas" : "Ej skapat"}</span></div>
         <p className="panel-description">Redigera ett påstående i taget och följ hänvisningarna till underlaget.</p>
         {state.status === "loading" && <p className="loading-notice">Skapar utkast… Befintlig text behålls tills svaret är klart.</p>}
-        <CertificateEditor result={state.result} onEdit={(claimId, text) => { controllerRef.current?.abort(); reviewControllerRef.current?.abort(); dispatch({ type: "claimEdited", claimId, text }); }}
+        <CertificateEditor state={state} result={state.result} onEdit={(claimId, text) => { controllerRef.current?.abort(); reviewControllerRef.current?.abort(); dispatch({ type: "claimEdited", claimId, text }); }}
           onSourceSelect={(id) => { setSelection({ id }); setActiveTab("source"); }} />
       </section>
       <section className="panel review-panel" {...panelProps("review")} aria-busy={reviewStatus === "loading"}>
-        <FindingsPanel draft={state.result} review={state.review} previousReview={state.previousReview} status={reviewStatus} error={state.reviewError}
-          canReview={!!state.result && !staleSource && state.status !== "loading" && mode !== null} sourceStale={staleSource} onReview={review}
+        <FindingsPanel key={`findings-${state.caseId}`} draft={state.result} review={state.review} previousReview={state.previousReview} status={reviewStatus} error={state.reviewError}
+          canReview={!!state.result && state.status !== "loading" && mode !== null} sourceStale={staleSource} onReview={review} dispositions={state.dispositions}
+          onDisposition={(findingId, status, note) => dispatch({ type: "findingDisposition", findingId, status, note })}
           onSource={(id) => { setSelection({ id }); setActiveTab("source"); }}
           onClaim={(id) => { setSelection({ id: `claim-${id}` }); setActiveTab("draft"); }}
           onQuestion={() => { setSelection({ id: "assessment" }); setActiveTab("source"); }} />
+        <ReportDownload key={`report-${state.caseId}`} state={state} />
       </section>
     </div>
   </>;

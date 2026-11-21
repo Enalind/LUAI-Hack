@@ -216,6 +216,12 @@ export const reviewDispositionSchema = z.strictObject({
   sourceRevision: revisionSchema,
   draftRevision: revisionSchema,
 });
+export const scopedDispositionSchema = reviewDispositionSchema.extend({ reviewRequestId: z.string().uuid() });
+export const sourceSnapshotResponseSchema = requestContextSchema.extend({ snapshot: sourceSnapshotSchema }).superRefine((result, ctx) => {
+  if (result.sourceRevision !== result.snapshot.sourceRevision) {
+    ctx.addIssue({ code: "custom", message: "Källrevisionerna stämmer inte överens." });
+  }
+});
 export const reviewResultSchema = requestContextSchema.extend({
   findings: findingsSchema,
   completionStatus: z.enum(["complete", "incomplete"]),
@@ -257,6 +263,8 @@ export type DraftDocument = z.infer<typeof draftDocumentSchema>;
 export type Finding = z.infer<typeof findingSchema>;
 export type ProposedChange = z.infer<typeof proposedChangeSchema>;
 export type ReviewDisposition = z.infer<typeof reviewDispositionSchema>;
+export type ScopedDisposition = z.infer<typeof scopedDispositionSchema>;
+export type SourceSnapshotResponse = z.infer<typeof sourceSnapshotResponseSchema>;
 export type ProviderDraftOutput = z.infer<typeof providerDraftOutputSchema>;
 export type ProviderReviewOutput = z.infer<typeof providerReviewOutputSchema>;
 export type ProviderMetadata = z.infer<typeof providerMetadataSchema>;

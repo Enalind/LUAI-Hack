@@ -1,12 +1,14 @@
 "use client";
 
+import type { WorkspaceState } from "../lib/workspace-state";
+import { FieldCopy } from "./export-controls";
 import { certificateFields } from "../lib/fields";
 import { validateEvidenceReferences } from "../lib/evidence";
 import { MAX_TEXT_CHARACTERS, type DraftResponse, type ExplicitDecision } from "../lib/schemas";
 
 function DecisionDisplay({ decision }: { decision: ExplicitDecision }) {
   return <section className="decision-display" aria-labelledby="decision-display-title">
-    <h3 id="decision-display-title">Läkarens beslut vid skapandet</h3>
+    <h3 id="decision-display-title">Läkarens beslut i källversionen</h3>
     <p className="input-help">Återgivet från läkarens inmatning.</p>
     <dl>
       <div><dt>Diagnos</dt><dd>{decision.diagnosisText?.trim() ? decision.diagnosisText : "Ej angiven"}</dd></div>
@@ -18,7 +20,7 @@ function DecisionDisplay({ decision }: { decision: ExplicitDecision }) {
   </section>;
 }
 
-export function CertificateEditor({ result, onEdit, onSourceSelect }: { result: DraftResponse | null; onEdit: (claimId: string, text: string) => void; onSourceSelect: (sourceId: string) => void }) {
+export function CertificateEditor({ state, result, onEdit, onSourceSelect }: { state: WorkspaceState; result: DraftResponse | null; onEdit: (claimId: string, text: string) => void; onSourceSelect: (sourceId: string) => void }) {
   return <>
     {result && <DecisionDisplay decision={result.draft.explicitDecision} />}
     <div className="draft-fields">{certificateFields.map(({ id, title, description }) => {
@@ -47,6 +49,7 @@ export function CertificateEditor({ result, onEdit, onSourceSelect }: { result: 
             </p>
           </article>;
         })}
+        {result && <FieldCopy state={state} fieldId={id} />}
         {!!section?.informationGaps.length && <div className="information-gaps"><strong>Behöver förtydligas</strong><ul>{section.informationGaps.map((gap, index) => <li key={index}>{gap}</li>)}</ul></div>}
       </section>;
     })}</div>

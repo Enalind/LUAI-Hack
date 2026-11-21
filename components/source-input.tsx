@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { appendClinicianAddition } from "../lib/clinician-additions";
+import { certificateFields } from "../lib/fields";
 import { developmentCases } from "../fixtures/development/cases";
-import { MAX_TEXT_CHARACTERS, type ExplicitDecision, type SourceInput } from "../lib/schemas";
+import { MAX_TEXT_CHARACTERS, type FieldId, type ExplicitDecision, type SourceInput } from "../lib/schemas";
 
 type Props = {
   caseId: string;
@@ -16,6 +19,8 @@ type Props = {
 };
 
 export function SourceInputForm({ caseId, input, busy, hasDraft, generationAvailable, mode, onCaseChange, onChange, onGenerate }: Props) {
+  const [addition, setAddition] = useState("");
+  const [field, setField] = useState<FieldId>("3");
   const decision = input.explicitDecision;
   function updateDecision(change: Partial<ExplicitDecision>) {
     onChange({ ...input, explicitDecision: { ...decision, ...change } });
@@ -63,11 +68,21 @@ export function SourceInputForm({ caseId, input, busy, hasDraft, generationAvail
         </div>
       </fieldset>
       </details>
+      {hasDraft && <fieldset className="clinician-addition"><legend>Lägg till läkaruppgift i underlaget</legend>
+        <label htmlFor="addition-field">Berört intygsfält</label><select id="addition-field" value={field} onChange={(event) => setField(event.target.value as FieldId)}>
+          {certificateFields.map(({ id, title }) => <option key={id} value={id}>{id} · {title}</option>)}
+        </select>
+        <label htmlFor="clinician-addition">Läkarens komplettering</label><textarea id="clinician-addition" rows={3} maxLength={MAX_TEXT_CHARACTERS} value={addition} onChange={(event) => setAddition(event.target.value)} />
+        <button type="button" className="secondary-button" disabled={!addition.trim() || appendClinicianAddition(input.clinicianAssessmentText, field, addition).length > MAX_TEXT_CHARACTERS} onClick={() => {
+          onChange({ ...input, clinicianAssessmentText: appendClinicianAddition(input.clinicianAssessmentText, field, addition) }); setAddition("");
+        }}>Lägg till i underlaget</button>
+        <p className="input-help">Välj sedan Granska. Befintlig intygstext behålls; kompletteringen kan föreslås som tillägg. Mock-kontrollen återger texten utan medicinsk bedömning.</p>
+      </fieldset>}
       <button className="primary-button" type="submit" disabled={busy || !generationAvailable}>
         {busy ? "Skapar utkast…" : hasDraft ? "Ersätt med nytt utkast" : "Skapa intygsutkast"}
       </button>
       {hasDraft && <p className="input-help">Ett nytt utkast ersätter dina ändringar i intygsfälten.</p>}
-      <p className="input-help">{mode === "live" ? "Live-läget skickar det fiktiva underlaget till Anthropic. Generering kan medföra en kostnad. Granska alltid text och källor." : "Mock-läget använder förberedda svar för exemplens oförändrade besöksunderlag och bedömning. Läkarens beslut kan ändras."}</p>
+      <p className="input-help">{mode === "live" ? "Live-läget skickar det fiktiva underlaget till Anthropic. Generering kan medföra en kostnad. Granska alltid text och källor." : "Mock-läget använder förberedda exempel och dina uttryckliga läkaruppgifter från kompletteringsfältet. Läkarens beslut kan ändras."}</p>
     </form>
   );
 }

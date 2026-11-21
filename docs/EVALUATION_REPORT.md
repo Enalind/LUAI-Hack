@@ -1,6 +1,10 @@
 # Evaluation report
 
-21 November 2026 · CP0–CP4
+21 November 2026 · CP0–CP5
+
+## CP5 software-only follow-up
+
+CP5 added editing/dispositions, deterministic source refresh, source supplementation and clean field/report export. All verification used prepared mocks/stub transports: **zero live draft calls and zero live review calls**. Mock supplement handling copies explicit clinician text with attribution and suppresses that field's prepared gap; it does not assess whether the added facts are medically sufficient. No live model/prompt changes or new clinical quality measurements were made. The upstream JSON development pack was translated to Swedish before CP5; it remains separate from the active TypeScript fixtures and has not been evaluated.
 
 ## CP4 review smoke — one model call
 
@@ -20,7 +24,7 @@
 | Target/reference integrity and unchanged draft | PASSED by runtime validation/assertion |
 | Clinical/held-out evaluation | NOT RUN |
 
-The test took 13.12 seconds overall and saved ignored `.local/review-smoke-result.json`. No credentials, raw sources or model prose were retained in that report. The extra work-relationship finding was not adjudicated; it must not be counted as either a correct finding or a false alarm without review. The known omission is one positive developer-authored semantic probe, not a clinical quality score. Full fact-retention, attribution, unsupported-claim, missed-gap and false-alarm measurements remain unperformed. The English JSON case pack and held-out cases were not used.
+The test took 13.12 seconds overall and saved ignored `.local/review-smoke-result.json`. No credentials, raw sources or model prose were retained in that report. The extra work-relationship finding was not adjudicated; it must not be counted as either a correct finding or a false alarm without review. The known omission is one positive developer-authored semantic probe, not a clinical quality score. Full fact-retention, attribution, unsupported-claim, missed-gap and false-alarm measurements remain unperformed. The separate JSON case pack and held-out cases were not used.
 
 ## CP3 draft smoke
 
@@ -43,7 +47,7 @@ The live follow-up passed one test in 13.38 seconds overall and produced a sanit
 
 The separate CP3 deterministic tests use synthetic Anthropic HTTP responses through the installed SDK. Their token assertions are test values. The earlier production live-mode UI check used a synthetic non-credential without generation. Those checks remain distinct from the actual smoke result above.
 
-CP2 exposes the prepared Swedish drafts through a validated route and browser workspace. All three development cases passed browser draft-flow checks; this is software evidence only. The English JSON case pack pulled from origin is preserved but not wired into the mock provider and has no reported evaluation result. Neither development set is held out.
+CP2 exposes the prepared Swedish drafts through a validated route and browser workspace. All three development cases passed browser draft-flow checks; this is software evidence only. The separate JSON case pack pulled from origin is preserved but not wired into the mock provider and has no reported evaluation result. Neither development set is held out.
 
 CP1 adds three fictional development cases, D1–D3, with independently authored answer keys in `fixtures/development/answer-keys.ts`. The mock implementation does not import those keys. H1–H3 held-out cases remain unwritten and unused; no held-out quality result is claimed. The rubric is developer-authored and not clinically validated.
 
