@@ -1,21 +1,15 @@
 import "server-only";
 import { draftRequestSchema, draftResponseSchema, type DraftResponse } from "../schemas";
-import { ConfigurationError, getServerConfig } from "./config";
+import { ConfigurationError } from "./config";
 import { ApplicationError } from "./errors";
-import { MockProvider } from "./mock-provider";
-import { LiveProvider } from "./live-provider";
+import { getCertificateProvider } from "./provider-factory";
 import type { CertificateProvider } from "./provider";
 import { validateDraftOutput } from "./provider-output";
 import { readJsonRequest } from "./request-body";
 import { createSourceSnapshot } from "./source-snapshot";
 
-function getDraftProvider(): CertificateProvider {
-  const config = getServerConfig();
-  return config.mode === "live" ? new LiveProvider(config) : new MockProvider();
-}
-
 /** Validate before selecting or calling any provider. Injection is server/test-only. */
-export function createDraftHandler(providerFactory: () => CertificateProvider = getDraftProvider) {
+export function createDraftHandler(providerFactory: () => CertificateProvider = getCertificateProvider) {
   return async function handleDraft(request: Request): Promise<Response> {
     let requestId = crypto.randomUUID();
     const headers = { "Cache-Control": "no-store" };

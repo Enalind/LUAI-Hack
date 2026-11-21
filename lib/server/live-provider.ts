@@ -1,13 +1,15 @@
 import "server-only";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { APICallError, generateText, NoObjectGeneratedError, NoOutputGeneratedError, Output } from "ai";
-import type { SourceSnapshot } from "../schemas";
+import { z } from "zod";
+import { decisionsEqual, draftDocumentSchema, type ProviderMetadata, type SourceSnapshot } from "../schemas";
 import type { getServerConfig } from "./config";
 import { ApplicationError } from "./errors";
-import type { CertificateProvider, ProviderCallOptions } from "./provider";
-import { validateDraftOutput } from "./provider-output";
+import type { CertificateProvider, ProviderCallOptions, ProviderReviewInput } from "./provider";
+import { validateDraftOutput, validateReviewOutput } from "./provider-output";
 import { validateSourceSnapshot } from "./source-snapshot";
-import { DRAFT_PROMPT_VERSION, DRAFT_SYSTEM_PROMPT, draftUserData, liveDraftContentSchema } from "./prompts";
+import { DRAFT_PROMPT_VERSION, DRAFT_SYSTEM_PROMPT, draftUserData, liveDraftContentSchema,
+  REVIEW_PROMPT_VERSION, REVIEW_SYSTEM_PROMPT, reviewUserData, liveReviewContentSchema } from "./prompts";
 
 export const LIVE_TIMEOUT_MS = 60_000;
 export const MAX_OUTPUT_TOKENS = 6_000;
@@ -54,7 +56,7 @@ function safeProviderError(error: unknown): ApplicationError {
   if (error instanceof ApplicationError) return error;
   if (NoObjectGeneratedError.isInstance(error) || NoOutputGeneratedError.isInstance(error)) {
     if (NoObjectGeneratedError.isInstance(error) && error.finishReason === "content-filter") {
-      return new ApplicationError("GENERATION_FAILED", "Modellen avböjde att skapa ett utkast. Kontrollera det fiktiva underlaget.", 502);
+      return new ApplicationError("GENERATION_FAILED", "Modellen avböjde förfrågan. Kontrollera det fiktiva underlaget.", 502);
     }
     return new ApplicationError("INVALID_MODEL_OUTPUT", "Modellsvaret var ofullständigt eller hade fel format. Försök igen.", 502);
   }
@@ -63,14 +65,14 @@ function safeProviderError(error: unknown): ApplicationError {
     const transient = error.statusCode === undefined || error.statusCode >= 500;
     return new ApplicationError("PROVIDER_UNAVAILABLE", transient ? "Modelltjänsten är tillfälligt otillgänglig. Försök igen." : "Modelltjänsten kunde inte användas. Kontrollera serverns modellkonfiguration och behörighet.", 503, transient);
   }
-  return new ApplicationError("GENERATION_FAILED", "Utkastet kunde inte skapas. Dina uppgifter finns kvar. Försök igen.", 502, true);
+  return new ApplicationError("GENERATION_FAILED", "Modellanropet kunde inte slutföras. Dina uppgifter finns kvar. Försök igen.", 502, true);
 }
 
 export class LiveProvider implements CertificateProvider {
   constructor(private readonly config: LiveConfig, private readonly options: LiveProviderOptions = {}) {}
 
-  async draft(value: SourceSnapshot, options: ProviderCallOptions = {}) {
-    const snapshot = validateSourceSnapshot(value);
+  private async generate<T>(schema: z.ZodType<T>, system: string, prompt: string, promptVersion: string,
+    validate: (content: T, metadata: ProviderMetadata) => void, options: ProviderCallOptions, retries: 0 | 1) {
     const started = Date.now();
     const budget = this.options.timeoutMs ?? LIVE_TIMEOUT_MS;
     const deadline = new AbortController();
@@ -83,9 +85,8 @@ export class LiveProvider implements CertificateProvider {
         try {
           const result = await abortable(generateText({
             model: anthropic(this.config.model),
-            system: DRAFT_SYSTEM_PROMPT,
-            prompt: draftUserData(snapshot),
-            output: Output.object({ schema: liveDraftContentSchema, name: "certificate_narrative" }),
+            system, prompt,
+            output: Output.object({ schema, name: "certificate_output" }),
             providerOptions: { anthropic: { structuredOutputMode: "outputFormat" } },
             maxOutputTokens: MAX_OUTPUT_TOKENS,
             maxRetries: 0, // Retry here so long Retry-After values never get shortened by SDK defaults.
@@ -96,29 +97,25 @@ export class LiveProvider implements CertificateProvider {
           }), signal);
           if (result.finishReason !== "stop") {
             throw new ApplicationError("GENERATION_FAILED", result.finishReason === "content-filter"
-              ? "Modellen avböjde att skapa ett utkast. Kontrollera det fiktiva underlaget."
-              : "Modellsvaret avslutades innan ett fullständigt utkast skapades. Försök igen.", 502);
+              ? "Modellen avböjde förfrågan. Kontrollera det fiktiva underlaget."
+              : "Modellsvaret avslutades innan ett fullständigt svar skapades. Försök igen.", 502);
           }
-          const parsed = liveDraftContentSchema.safeParse(result.output);
-          if (!parsed.success || parsed.data.sections.some((section) => !section.claims.length && !section.informationGaps.length)) invalidOutput();
+          const parsed = schema.safeParse(result.output);
+          if (!parsed.success) invalidOutput();
           const usage = result.totalUsage;
-          const output = {
-            sections: parsed.data.sections,
-            metadata: {
+          const metadata: ProviderMetadata = {
               mode: "live" as const, modelId: result.response.modelId ?? this.config.model,
-              promptVersion: DRAFT_PROMPT_VERSION, latencyMs: Date.now() - started,
+              promptVersion, latencyMs: Date.now() - started,
               usage: { inputTokens: usage.inputTokens ?? null, outputTokens: usage.outputTokens ?? null,
                 reasoningTokens: usage.outputTokenDetails.reasoningTokens ?? null, totalTokens: usage.totalTokens ?? null },
-            },
           };
-          // Live failures remain failures; do not return a normal draft with broken/missing evidence.
-          if (validateDraftOutput(snapshot, output).validationFindings.length) invalidOutput();
+          validate(parsed.data, metadata);
           if (signal.aborted || Date.now() - started >= budget) throw timeoutError();
-          return output;
+          return { content: parsed.data, metadata };
         } catch (error) {
           if (signal.aborted) throw timeoutError();
           if (APICallError.isInstance(error) && (error.statusCode === 429 || (error.statusCode !== undefined && error.statusCode >= 500))
-            && attempt < (this.options.maxRetries ?? 1)) {
+            && attempt < retries) {
             const delay = retryDelay(error);
             if (delay <= MAX_RETRY_DELAY_MS && delay + 1_000 < budget - (Date.now() - started)) {
               await waitForRetry(delay, signal);
@@ -131,7 +128,24 @@ export class LiveProvider implements CertificateProvider {
     } finally { clearTimeout(timer); }
   }
 
-  async review(): Promise<never> {
-    throw new ApplicationError("PROVIDER_UNAVAILABLE", "Live-granskning är ännu inte tillgänglig.", 503);
+  async draft(value: SourceSnapshot, options: ProviderCallOptions = {}) {
+    const snapshot = validateSourceSnapshot(value);
+    const result = await this.generate(liveDraftContentSchema, DRAFT_SYSTEM_PROMPT, draftUserData(snapshot), DRAFT_PROMPT_VERSION,
+      (content, metadata) => {
+        if (content.sections.some((section) => !section.claims.length && !section.informationGaps.length)) invalidOutput();
+        if (validateDraftOutput(snapshot, { ...content, metadata }).validationFindings.length) invalidOutput();
+      }, options, this.options.maxRetries ?? 1);
+    return { ...result.content, metadata: result.metadata };
+  }
+
+  async review({ snapshot: value, draft: draftValue }: ProviderReviewInput, options: ProviderCallOptions = {}) {
+    const snapshot = validateSourceSnapshot(value);
+    const draft = draftDocumentSchema.parse(draftValue);
+    if (!decisionsEqual(draft.explicitDecision, snapshot.input.explicitDecision)) {
+      throw new ApplicationError("INVALID_INPUT", "Läkarens beslut måste motsvara källversionen.", 400);
+    }
+    const result = await this.generate(liveReviewContentSchema, REVIEW_SYSTEM_PROMPT, reviewUserData({ snapshot, draft }), REVIEW_PROMPT_VERSION,
+      (content, metadata) => { validateReviewOutput(snapshot, draft, { ...content, metadata }); }, options, 0);
+    return { ...result.content, metadata: result.metadata };
   }
 }

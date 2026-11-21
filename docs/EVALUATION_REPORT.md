@@ -1,19 +1,47 @@
 # Evaluation report
 
-21 November 2026 · CP0–CP3
+21 November 2026 · CP0–CP4
 
-Live smoke and evaluation: NOT RUN. The CP3 provider and initial draft prompt are implemented, but no Anthropic key was available in the server environment/local env files. The explicit smoke wrapper exited 2 with NOT RUN and made zero model calls. No billable requests have been made.
+## CP4 review smoke — one model call
 
-| CP3 intended smoke | Actual evidence |
+`npm run smoke:review` PASSED with one live review, zero live draft calls and no retries. All development/unit/integration/browser work used deterministic mocks or stub transports. No extra calls were made to tune or rerun this probe.
+
+| Review smoke | Actual evidence |
 | --- | --- |
-| Date | 21 November 2026 |
-| Fixture | Swedish development D1, configured for the opt-in command; not sent to a model |
-| Configured model | `claude-sonnet-5-5`; actual served model ID unknown |
+| Date | 21 November 2026, 13:08 Europe/Stockholm (12:08 UTC) |
+| Source/draft | Swedish development D1; mock-prepared draft with the lifting-duty claim removed |
+| Configured / served model | `claude-sonnet-5-5` / `claude-sonnet-5-5` |
+| Prompt | `swedish-review-v1`; initial development prompt, not a held-out freeze |
+| Completion / provider latency | PASSED / 12,943 ms |
+| Input / output / total tokens | 5,602 / 1,526 / 7,128 |
+| Reasoning tokens | 710, included in output tokens |
+| Findings | 2; `work_tasks` and `work_relationship` |
+| Known work omission | Detected (`available_but_missing`, field 3) |
+| Target/reference integrity and unchanged draft | PASSED by runtime validation/assertion |
+| Clinical/held-out evaluation | NOT RUN |
+
+The test took 13.12 seconds overall and saved ignored `.local/review-smoke-result.json`. No credentials, raw sources or model prose were retained in that report. The extra work-relationship finding was not adjudicated; it must not be counted as either a correct finding or a false alarm without review. The known omission is one positive developer-authored semantic probe, not a clinical quality score. Full fact-retention, attribution, unsupported-claim, missed-gap and false-alarm measurements remain unperformed. The English JSON case pack and held-out cases were not used.
+
+## CP3 draft smoke
+
+Live draft contract/reference smoke: PASSED on the user's minimal-test follow-up after a key was added to ignored `.env`. That command made exactly one live D1 draft call, no retries and no review calls. The earlier missing-key attempt made zero calls. See the separate CP4 review probe above; full clinical/held-out evaluation remains NOT RUN.
+
+| CP3 live smoke | Actual evidence |
+| --- | --- |
+| Date | 21 November 2026, 12:38 Europe/Stockholm (11:38 UTC) |
+| Fixture | Swedish development D1; one draft call, no retries/reviews |
+| Configured / served model | `claude-sonnet-5-5` / `claude-sonnet-5-5` |
 | Prompt | `swedish-draft-v1`; initial prompt, not a held-out evaluation freeze |
-| Completion, latency, tokens (including reasoning) | NOT RUN / N/A |
+| Completion / provider latency | PASSED / 13,219 ms |
+| Reported input / output / total tokens | 2,485 / 1,777 / 4,262 |
+| Reported reasoning tokens | 0 |
+| Claim / reference count | 7 / 7; all seven references passed exact ID/quote checks |
+| Clinician decisions | Unchanged; passthrough assertion PASSED |
 | Clinical/semantic review | NOT RUN |
 
-CP3 deterministic tests use synthetic Anthropic HTTP responses through the installed SDK. Reported tokens in those assertions are test values, not billed usage or evidence of model quality. The production live-mode UI was checked using a synthetic non-credential without invoking generation. Neither check satisfies an actual live smoke or semantic evaluation.
+The live follow-up passed one test in 13.38 seconds overall and produced a sanitized report at ignored `.local/live-smoke-result.json`. That report contains no credentials, source text or model prose. `.env` is ignored. No code changes or additional model calls were needed. The seven references establish string integrity only; unsupported-claim, attribution, omission and clinical-quality scores were not assessed.
+
+The separate CP3 deterministic tests use synthetic Anthropic HTTP responses through the installed SDK. Their token assertions are test values. The earlier production live-mode UI check used a synthetic non-credential without generation. Those checks remain distinct from the actual smoke result above.
 
 CP2 exposes the prepared Swedish drafts through a validated route and browser workspace. All three development cases passed browser draft-flow checks; this is software evidence only. The English JSON case pack pulled from origin is preserved but not wired into the mock provider and has no reported evaluation result. Neither development set is held out.
 
@@ -21,12 +49,12 @@ CP1 adds three fictional development cases, D1–D3, with independently authored
 
 | Development fixture | Deterministic software checks | Live semantic evaluation |
 | --- | --- | --- |
-| D1 — Warehouse work | PASSED: source-linked drafting, attribution and unchanged decision; corrupted duties/assessment omissions receive cited additions. | NOT RUN |
+| D1 — Warehouse work | PASSED: source-linked drafting, attribution and unchanged decision; corrupted duties/assessment omissions receive cited additions. | One known work-omission probe detected; full evaluation NOT RUN |
 | D2 — Missing work information | PASSED: missing sections remain empty with questions; no job, clinician reasoning or decision supplied by mock. | NOT RUN |
 | D3 — Attribution and negation | PASSED: denial preserved; corrupted denial and question-as-finding receive replacement/deletion findings. | NOT RUN |
 
 Mock metadata: mode `mock`, model identifier `prepared-swedish-fixtures-v1`, template identifier `mock-templates-v1`, synthetic deterministic latency `0 ms`, usage `null`. This latency is not a measurement of model performance and the template identifier is not a live prompt version. The mock reviewer compares prepared wording; it can flag paraphrases and does not establish clinical correctness.
 
-Live facts retained, unsupported-claim counts, attribution quality, missed gaps, false findings, decision violations, billed usage and latency are all NOT RUN/N/A. No denominator or success rate is inferred from the mock checks. Clinical mentor review: NOT RUN.
+Live facts retained, unsupported-claim counts, attribution quality, missed gaps and false findings remain NOT RUN/N/A. Decision passthrough and reference integrity passed on the draft smoke; review target/reference checks and one known omission probe passed separately. Provider-reported usage and latency are recorded above. No clinical success rate or cost estimate is inferred. Clinical mentor review: NOT RUN.
 
-The configured default model identifier is `claude-sonnet-5-5`, as specified in PRODUCT_SPEC.md; draft prompt version is `swedish-draft-v1`. Account access, actual served model ID, live token usage/latency, Swedish output quality and human clinical review remain unverified. Set a server-side key and run the explicit smoke, then complete the later semantic evaluation before describing live behavior as demo-ready.
+The configured default model identifier is `claude-sonnet-5-5`, as specified in PRODUCT_SPEC.md; prompt versions are `swedish-draft-v1` and `swedish-review-v1`. Account/model access, drafting and review contracts were each demonstrated once. General Swedish semantic quality and human clinical review remain unverified; complete the later evaluation before describing live behavior as demo-ready.

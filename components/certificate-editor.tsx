@@ -41,7 +41,9 @@ export function CertificateEditor({ result, onEdit, onSourceSelect }: { result: 
               return <button key={`${ref.sourceId}-${refIndex}`} type="button" className="source-chip" aria-label={`${stale ? "Visa tidigare källa" : "Visa källa"} ${number} för påstående ${index + 1} i ${title}`} onClick={() => onSourceSelect(ref.sourceId)}>{stale ? "Tidigare källa" : "Källa"} {number}</button>;
             })}</div>
             <p className={`claim-status ${stale || claim.integrityStatus !== "valid" ? "needs-attention" : ""}`}>
-              {stale ? "Ändrat – tidigare källstöd behöver granskas på nytt." : claim.integrityStatus === "valid" ? "Hänvisning matchar underlaget. Innehållet är inte granskat." : "Källhänvisningen behöver kontrolleras."}
+              {stale ? "Ändrat – tidigare källstöd behöver granskas på nytt." : claim.integrityStatus !== "valid" ? "Källhänvisningen behöver kontrolleras."
+                : claim.supportStatus === "reviewed" ? "Kontroll genomförd; läkarens granskning återstår."
+                : claim.supportStatus === "needs_review" ? "Påståendet berörs av ett granskningsfynd." : "Hänvisning matchar underlaget. Innehållet är inte granskat."}
             </p>
           </article>;
         })}

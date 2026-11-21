@@ -1,8 +1,36 @@
 # Test report
 
+## CP4 — 21 November 2026
+
+Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6 and unchanged AI SDK/provider versions. The user's minimal-call constraint was met: exactly **one live review request**, **zero live draft requests** and **no retries** during CP4. All other checks used mock providers or stub Anthropic transports, never real-key calls.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm test` | PASSED; 12 files, 181 tests (44 new CP4 scenarios), 444 ms. |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; 20 Chromium mock-mode tests, 5.8 seconds, including 9 new review journeys. |
+| `npm run build` | PASSED; Node.js `/api/review` included alongside draft/health/page routes. |
+| `npm run smoke:review` | PASSED; 1 test in 13.12 seconds overall. Prepared D1 draft through mock, then one live review without retries. Known lifting-duty omission detected. Provider latency 12,943 ms; 5,602 input / 1,526 output / 7,128 total tokens, including 710 reasoning tokens within output. |
+| Visual checks | Desktop 1280px and narrow 375px review/evidence screenshots inspected: cards, questions, proposals, field/source navigation and tab readability. Browser checks assert no horizontal overflow. |
+| Credential checks | 12 public build files scanned; no synthetic key/test marker hits. Tracked/unignored source scan found no Anthropic key-pattern matches. `.env` and `.local/review-smoke-result.json` are ignored. |
+| `git diff --check` | PASSED; original plans, research fixtures and dependency lockfile unchanged. |
+
+New deterministic checks cover all three fictional cases, genuine missing information versus omitted available detail, negation/attribution corruption, unknown targets/wrong fields/invalid proposed quotes, duplicate handling without losing distinct issues, invalid snapshot/revision/decision/claim inputs before provider selection, empty completed reviews, explicit incomplete failures with retained code findings/draft, all 400 possible claim-integrity errors, review transport parsing/refusal/truncation/rate limits/timeouts without retries, and revision/request guards. Earlier complete findings survive incomplete rechecks and replacement drafts until a complete current review succeeds.
+
+Browser journeys exercise explicit (never automatic) review, limited empty-review wording, missing-source questions with no invented citations or decisions, a known omission with a cited addition, a reversed denial with a replacement and target focus, review failure/retry without losing edits, manual correction/recheck, replacement-draft staleness, an older uncancellable review ignored after editing, and narrow tabs/question navigation. No suggestions are automatically applied; accept/dismiss/application/export are still CP5.
+
+Live review returned two findings (work tasks and work relationship). Only the deliberate work omission was probed; the additional finding is unadjudicated. General clinical quality and held-out evaluation remain NOT RUN. The sanitized report contains metadata/counts only; no key/source/model prose was printed or retained there. No deployment or certificate transmission occurred. Live smoke commands now select their own test file explicitly, preventing accidental combined draft/review calls.
+
+## Minimal live smoke follow-up — 21 November 2026
+
+`npm run smoke:live` PASSED: 1 file, 1 test, 13.38 seconds overall. Exactly one potentially billable request used the key from ignored `.env`; no retries or review calls. Provider model `claude-sonnet-5-5`, prompt `swedish-draft-v1`, fictional Swedish D1. Provider latency 13,219 ms; reported input/output/total tokens 2,485/1,777/4,262; reasoning tokens 0. Seven claims and seven exact ID/quote-valid references; explicit clinician decision passthrough passed.
+
+The sanitized report is saved in ignored `.local/live-smoke-result.json`. `git check-ignore` confirmed both `.env` and that report are excluded. No key, source text or model prose was printed. No code changes, further model calls, clinical evaluation or deployment occurred. Prior deterministic/build/browser evidence below was not rerun for this test-only follow-up. The initial missing-key outcome below is historical and is superseded by this actual smoke result.
+
 ## CP3 — 21 November 2026
 
-Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6, AI SDK 7.0.179 and direct Anthropic provider 4.0.107. No dependency upgrades or real provider credentials were used. Normal tests do not load local env files or run the opt-in live test.
+Initial implementation verification environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6, AI SDK 7.0.179 and direct Anthropic provider 4.0.107. No dependency upgrades or real provider credentials were used in those initial checks. Normal tests do not load local env files or run the opt-in live test.
 
 | Command / verification | Actual outcome |
 | --- | --- |
@@ -20,7 +48,7 @@ The new tests exercise actual installed AI SDK and Anthropic adapter parsing aga
 
 These tests do not prove semantic source support, clinical correctness or resistance to every source injection. The live provider rejects reference-integrity failures, while the existing mock contract can return separate integrity findings. No successful empty response or mock fallback replaces a live failure. Existing draft/edit retention tests and browser flows remain green. The production shell check validates configuration/UI isolation only; a synthetic key does not establish account or model access. Its server was stopped after verification.
 
-SDK APIs were verified against installed docs/types and [structured-output documentation](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data), [direct Anthropic documentation](https://ai-sdk.dev/providers/ai-sdk-providers/anthropic), and [generation limits/cancellation documentation](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text). No actual live smoke/evaluation, live review, deployment access-protection check or Vercel plan verification occurred.
+SDK APIs were verified against installed docs/types and [structured-output documentation](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data), [direct Anthropic documentation](https://ai-sdk.dev/providers/ai-sdk-providers/anthropic), and [generation limits/cancellation documentation](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text). No actual live smoke occurred during the initial implementation checks; see the follow-up above. Live review, clinical/held-out evaluation, deployment access-protection and Vercel plan checks remain unperformed.
 
 ## CP2 — 21 November 2026
 

@@ -1,0 +1,60 @@
+"use client";
+
+import type { DraftResponse, Finding, ReviewResult } from "../lib/schemas";
+import type { getReviewStatus } from "../lib/workspace-state";
+import { validateEvidenceReferences } from "../lib/evidence";
+
+const categories = { work_tasks: "Arbetsuppgifter och krav", work_relationship: "Samband med arbetet", assessment_basis: "Bedömningsgrund och attribution", support_and_contradictions: "Källstöd och motsägelser" };
+const actions = { available_but_missing: "Finns i källan men saknas i utkastet", source_information_missing: "Information saknas i underlaget", unsupported_or_conflicting: "Källstöd eller formulering behöver granskas", unclear: "Behöver förtydligas" };
+const operations = { add: "Lägg till", replace: "Ersätt påståendet", delete: "Ta bort påståendet" };
+type Props = {
+  draft: DraftResponse | null; review: ReviewResult | null; previousReview: ReviewResult | null;
+  status: ReturnType<typeof getReviewStatus>; error: string | null; canReview: boolean; sourceStale: boolean;
+  onReview: () => void; onSource: (id: string) => void; onClaim: (id: string) => void; onQuestion: () => void;
+};
+
+export function FindingsPanel({ draft, review, previousReview, status, error, canReview, sourceStale, onReview, onSource, onClaim, onQuestion }: Props) {
+  function cards(findings: Finding[], old = false) {
+    return findings.map((finding) => {
+      const claim = draft?.draft.sections.flatMap(({ claims }) => claims).find(({ id }) => id === finding.targetClaimId);
+      const refs = draft ? validateEvidenceReferences([...finding.evidenceRefs, ...(finding.proposedChange?.evidenceRefs ?? [])], draft.snapshot).validRefs : [];
+      const uniqueRefs = refs.filter((ref, index) => refs.findIndex((other) => other.sourceId === ref.sourceId && other.exactQuote === ref.exactQuote) === index);
+      return <article className={`finding-card ${old ? "old-finding" : ""}`} key={finding.id} aria-label={`Fynd: ${categories[finding.category]}`}>
+        <div className="finding-heading"><span className="finding-priority">{finding.priority === "needs_review" ? "Behöver granskas" : "Förtydligande"}</span><span>Fält {finding.fieldId}</span></div>
+        <h3>{categories[finding.category]}</h3><p className="finding-type">{actions[finding.actionType]}</p>
+        {old && <p className="needs-attention">Tidigare fynd – kontrollera mot aktuell version.</p>}
+        <p>{finding.explanation}</p>
+        {claim && <button type="button" className="text-button" onClick={() => onClaim(claim.id)}>Gå till berört påstående</button>}
+        {finding.question && <div className="finding-question"><strong>Fråga till läkaren</strong><p>{finding.question}</p><button type="button" className="text-button" onClick={onQuestion}>Komplettera underlaget</button></div>}
+        {finding.proposedChange && <div className="proposed-change"><strong>Förslag: {operations[finding.proposedChange.operation]}</strong>
+          {finding.proposedChange.text && <p>{finding.proposedChange.text}</p>}
+          <p className="input-help">Bedöm förslaget innan intygstexten ändras. Inga ändringar görs automatiskt.</p>
+        </div>}
+        <div className="evidence-buttons">{uniqueRefs.map((ref, index) => {
+          const number = draft!.snapshot.passages.findIndex(({ id }) => id === ref.sourceId) + 1;
+          return <button type="button" className="source-chip" key={`${ref.sourceId}-${index}`} onClick={() => onSource(ref.sourceId)} aria-label={`Visa källa ${number} för granskningsfynd`}>Källa {number}</button>;
+        })}</div>
+      </article>;
+    });
+  }
+  const incomplete = status === "incomplete" || (status === "loading" && review?.completionStatus === "incomplete");
+  return <>
+    <div className="panel-heading"><h2 id="review-title">Granskning</h2><span className="tag">{status === "complete" ? "Kontroll genomförd" : status === "stale" ? "Inaktuell" : status === "incomplete" ? "Ofullständig" : status === "loading" ? "Pågår" : "Ej körd"}</span></div>
+    <p className="panel-description">Kontroll av källhänvisningar och innehåll i fyra kategorier.</p>
+    <button type="button" className="primary-button" disabled={!canReview || status === "loading"} onClick={onReview}>
+      {status === "loading" ? "Granskar utkast…" : status === "incomplete" ? "Försök granska igen" : review ? "Granska på nytt" : "Granska utkast"}
+    </button>
+    <p className="input-help">Granskning startas när du väljer den. Live-läget använder ett modellanrop utan automatisk omkörning.</p>
+    {!draft && <p>Skapa ett utkast innan du granskar.</p>}
+    {sourceStale && <p className="needs-attention">Skapa ett nytt utkast med aktuellt underlag innan du granskar.</p>}
+    {status === "loading" && <p role="status" aria-label="Granskningsstatus">Granskar utkast… Intygstexten finns kvar och kan redigeras.</p>}
+    {status === "stale" && <p className="stale-notice">Tidigare granskning är inaktuell efter ändringar. Kör en ny granskning.</p>}
+    {incomplete && <div className="error" role="alert" aria-label="Granskningsfel"><strong>Granskningen är ofullständig</strong><p>{error ?? review?.error?.message ?? "Kontrollen kunde inte slutföras."}</p><p>Intygstexten finns kvar. Eventuella kodkontroller och tidigare fynd visas nedan.</p></div>}
+    {status === "complete" && review?.findings.length === 0 && <p className="review-empty-result">Inga problem identifierades av kontrollen.</p>}
+    {review && <p className="input-help">{review.completionStatus === "complete" ? `${review.findings.length} fynd. ` : "Kodkontroller för denna version. "}{review.metadata?.mode === "mock" ? "Förberedd mock-kontroll." : review.metadata?.mode === "live" ? "Modellassisterad kontroll." : "Modellkontrollen slutfördes inte."}</p>}
+    {review && cards(review.findings, status === "stale" || (status === "incomplete" && review.completionStatus === "complete"))}
+    {previousReview && <section aria-label="Tidigare granskningsfynd"><h3>Tidigare granskningsfynd</h3>{cards(previousReview.findings, true)}</section>}
+    {status === "idle" && !!draft?.validationFindings.length && <div className="integrity-findings" role="alert"><h3>Källhänvisningar behöver kontrolleras</h3>{cards(draft.validationFindings)}</div>}
+    <p className="review-note">Kontrollen kan missa problem. Läkarens genomgång krävs; matchande hänvisningar innebär inte medicinsk verifiering eller ett myndighetsgodkännande.</p>
+  </>;
+}

@@ -2,11 +2,12 @@
 
 import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from "react";
 import { developmentCases } from "../fixtures/development/cases";
-import { apiErrorSchema, draftResponseSchema, sourceInputSchema, type RequestContext, type SourceInput } from "../lib/schemas";
-import { emptySourceInput, initialWorkspaceState, workspaceReducer } from "../lib/workspace-state";
+import { apiErrorSchema, draftResponseSchema, reviewRequestSchema, reviewResultSchema, sourceInputSchema, type RequestContext, type SourceInput } from "../lib/schemas";
+import { emptySourceInput, getReviewStatus, initialWorkspaceState, workspaceReducer } from "../lib/workspace-state";
 import { SourceInputForm } from "./source-input";
 import { SourcePanel } from "./source-panel";
 import { CertificateEditor } from "./certificate-editor";
+import { FindingsPanel } from "./findings-panel";
 
 const tabs = [{ id: "source", label: "Underlag" }, { id: "draft", label: "Intygsutkast" }, { id: "review", label: "Granskning" }] as const;
 type TabId = typeof tabs[number]["id"];
@@ -23,13 +24,17 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
   const [activeTab, setActiveTab] = useState<TabId>("source");
   const [selection, setSelection] = useState<{ id: string } | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
+  const reviewControllerRef = useRef<AbortController | null>(null);
   const narrow = useSyncExternalStore(subscribeToWidth, isNarrow, serverWidth);
   const staleSource = !!state.result && state.result.snapshot.sourceRevision !== state.input.sourceRevision;
+  const reviewStatus = getReviewStatus(state);
 
-  useEffect(() => () => controllerRef.current?.abort(), []);
+  useEffect(() => () => { controllerRef.current?.abort(); reviewControllerRef.current?.abort(); }, []);
   useEffect(() => {
-    if (selection && (!narrow || activeTab === "source")) {
+    if (selection) {
       const passage = document.getElementById(selection.id);
+      const disclosure = passage?.closest("details");
+      if (disclosure instanceof HTMLDetailsElement) disclosure.open = true;
       passage?.focus({ preventScroll: true });
       passage?.scrollIntoView({ block: "center", behavior: "instant" });
     }
@@ -37,6 +42,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
 
   function changeCase(caseId: string) {
     controllerRef.current?.abort();
+    reviewControllerRef.current?.abort();
     const fixture = developmentCases.find(({ id }) => id === caseId);
     dispatch({ type: "caseChanged", caseId: fixture?.id ?? "custom", input: fixture?.input ?? emptySourceInput() });
     setSelection(null);
@@ -44,11 +50,13 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
   }
   function changeSource(input: SourceInput) {
     controllerRef.current?.abort();
+    reviewControllerRef.current?.abort();
     dispatch({ type: "sourceChanged", input });
   }
 
   async function generate() {
     controllerRef.current?.abort();
+    reviewControllerRef.current?.abort();
     if (!sourceInputSchema.safeParse(state.input).success) {
       dispatch({ type: "invalid", message: !state.input.consultationText.trim() && !state.input.clinicianAssessmentText.trim()
         ? "Ange besöksunderlag eller läkarens bedömning för ett fiktivt patientfall."
@@ -90,6 +98,41 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
       if (controllerRef.current === controller) controllerRef.current = null;
     }
   }
+
+  async function review() {
+    if (!state.result || staleSource || state.status === "loading" || mode === null) return;
+    reviewControllerRef.current?.abort();
+    const context: RequestContext = { requestId: crypto.randomUUID(), sourceRevision: state.input.sourceRevision, draftRevision: state.draftRevision };
+    dispatch({ type: "reviewRequested", context });
+    setActiveTab("review");
+    const input = reviewRequestSchema.safeParse({ ...context, snapshot: state.result.snapshot, draft: state.result.draft, explicitDecision: state.input.explicitDecision });
+    if (!input.success) {
+      dispatch({ type: "reviewFailed", context, message: "Kontrollera att alla påståenden innehåller text och att läkarens beslut motsvarar källversionen." });
+      return;
+    }
+    const controller = new AbortController();
+    reviewControllerRef.current = controller;
+    const timer = window.setTimeout(() => controller.abort("timeout"), 70_000);
+    try {
+      const response = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input.data), signal: controller.signal });
+      const body: unknown = await response.json();
+      const parsed = reviewResultSchema.safeParse(body);
+      if (response.ok && parsed.success && parsed.data.requestId === context.requestId && parsed.data.sourceRevision === context.sourceRevision
+        && parsed.data.draftRevision === context.draftRevision && (!parsed.data.metadata || parsed.data.metadata.mode === mode)) {
+        dispatch({ type: "reviewReceived", result: parsed.data });
+      } else {
+        const error = apiErrorSchema.safeParse(body);
+        dispatch({ type: "reviewFailed", context, message: error.success ? error.data.message : "Granskningssvaret kunde inte valideras. Intygstexten finns kvar." });
+      }
+    } catch {
+      dispatch({ type: "reviewFailed", context, message: controller.signal.reason === "timeout"
+        ? "Granskningen tog för lång tid. Intygstexten finns kvar. Försök igen."
+        : "Granskningen kunde inte hämtas. Intygstexten finns kvar. Försök igen." });
+    } finally {
+      window.clearTimeout(timer);
+      if (reviewControllerRef.current === controller) reviewControllerRef.current = null;
+    }
+  }
   function panelProps(id: TabId) {
     return { id: `panel-${id}`, role: narrow ? "tabpanel" as const : undefined,
       "aria-labelledby": narrow ? `tab-${id}` : `${id}-title`, hidden: narrow && activeTab !== id };
@@ -97,7 +140,9 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
 
   return <>
     <div className="workspace-status" role="status" aria-label="Utkaststatus">
-      <strong>{state.status === "loading" ? "Skapar utkast…" : state.result ? "Utkast skapat · ej granskat" : "Inget utkast skapat"}</strong>
+      <strong>{state.status === "loading" ? "Skapar utkast…" : reviewStatus === "loading" ? "Granskar utkast…" : state.result
+        ? reviewStatus === "complete" ? "Utkast skapat · kontroll genomförd" : reviewStatus === "stale" ? "Utkast skapat · granskning inaktuell"
+        : reviewStatus === "incomplete" ? "Utkast skapat · granskning ofullständig" : "Utkast skapat · ej granskat" : "Inget utkast skapat"}</strong>
       <span>Källversion {state.input.sourceRevision} · Utkastversion {state.draftRevision}</span>
     </div>
     {configurationError && <div className="error" role="alert" aria-label="Konfigurationsfel"><strong>Generering är inte tillgänglig</strong><p>{configurationError}</p></div>}
@@ -121,19 +166,18 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
         <SourcePanel snapshot={state.result?.snapshot ?? null} selectedSourceId={selection?.id ?? null} stale={staleSource} />
       </section>
       <section className="panel draft-panel" {...panelProps("draft")} aria-busy={state.status === "loading"}>
-        <div className="panel-heading"><h2 id="draft-title">Intygsutkast</h2><span className="tag">{state.result ? "Ej granskat" : "Ej skapat"}</span></div>
+        <div className="panel-heading"><h2 id="draft-title">Intygsutkast</h2><span className="tag">{state.result ? reviewStatus === "complete" ? "Kontroll genomförd" : "Behöver granskas" : "Ej skapat"}</span></div>
         <p className="panel-description">Redigera ett påstående i taget och följ hänvisningarna till underlaget.</p>
         {state.status === "loading" && <p className="loading-notice">Skapar utkast… Befintlig text behålls tills svaret är klart.</p>}
-        <CertificateEditor result={state.result} onEdit={(claimId, text) => { controllerRef.current?.abort(); dispatch({ type: "claimEdited", claimId, text }); }}
+        <CertificateEditor result={state.result} onEdit={(claimId, text) => { controllerRef.current?.abort(); reviewControllerRef.current?.abort(); dispatch({ type: "claimEdited", claimId, text }); }}
           onSourceSelect={(id) => { setSelection({ id }); setActiveTab("source"); }} />
       </section>
-      <section className="panel review-panel" {...panelProps("review")}>
-        <div className="panel-heading"><h2 id="review-title">Granskning</h2><span className="tag">Ej körd</span></div>
-        <p className="panel-description">En separat kontroll inför läkarens genomgång.</p>
-        <div className="review-empty"><h3>Utkastet behöver granskas</h3><p>Granskningsflödet är ännu inte tillgängligt. Kontrollera formuleringar, informationsluckor och källor manuellt.</p></div>
-        {!!state.result?.validationFindings.length && <div className="integrity-findings" role="alert"><h3>Källhänvisningar behöver kontrolleras</h3><ul>{state.result.validationFindings.map((finding) => <li key={finding.id}>Fält {finding.fieldId}: {finding.explanation}</li>)}</ul></div>}
-        <ul className="review-categories"><li>Arbetsuppgifter och krav</li><li>Samband med arbetet</li><li>Bedömningsgrund och attribution</li><li>Källstöd och motsägelser</li></ul>
-        <p className="review-note">Ingen granskning har utförts. Matchande hänvisningar innebär inte att innehållet är medicinskt verifierat.</p>
+      <section className="panel review-panel" {...panelProps("review")} aria-busy={reviewStatus === "loading"}>
+        <FindingsPanel draft={state.result} review={state.review} previousReview={state.previousReview} status={reviewStatus} error={state.reviewError}
+          canReview={!!state.result && !staleSource && state.status !== "loading" && mode !== null} sourceStale={staleSource} onReview={review}
+          onSource={(id) => { setSelection({ id }); setActiveTab("source"); }}
+          onClaim={(id) => { setSelection({ id: `claim-${id}` }); setActiveTab("draft"); }}
+          onQuestion={() => { setSelection({ id: "assessment" }); setActiveTab("source"); }} />
       </section>
     </div>
   </>;

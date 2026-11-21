@@ -122,3 +122,14 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.3r
   .mode-badge { font-size: .8rem; }
   .date-inputs { grid-template-columns: 1fr; }
 }
+.finding-card { border: 1px solid #d8ddcf; border-left: 3px solid #b38639; border-radius: .5rem; padding: 1rem; margin: 1rem 0; overflow-wrap: anywhere; }
+.finding-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; font-size: .875rem; margin-bottom: .7rem; color: var(--muted); }
+.finding-priority { color: #795115; font-weight: 600; }
+.finding-type { font-size: .875rem; font-weight: 600; }
+.finding-card > p { font-size: .875rem; }
+.finding-card .evidence-buttons { margin-top: .8rem; }
+.finding-question, .proposed-change { font-size: .875rem; background: #f5f7f3; border-radius: .4rem; padding: .8rem; margin: .8rem 0; }
+.finding-question p, .proposed-change p { margin: .5rem 0; white-space: pre-wrap; }
+.old-finding { border-style: dashed; background: #f8f9f7; }
+.text-button { padding: .45rem .15rem; border: 0; background: transparent; color: var(--teal); text-decoration: underline; text-underline-offset: .2rem; font-size: .875rem; text-align: left; }
+.review-empty-result { border-left: 3px solid #86aea0; padding: .8rem; font-size: 1rem; background: #f0f5f3; }

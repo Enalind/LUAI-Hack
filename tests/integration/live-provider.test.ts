@@ -177,7 +177,7 @@ describe("live Anthropic provider through the installed AI SDK transport", () =>
     const output = await new LiveProvider({ ...config, model: "configured-model" }, { fetch: fetcher }).draft(snapshot);
     expect(JSON.parse(String(fetcher.mock.calls[0][1]?.body)).model).toBe("configured-model");
     expect(output.metadata.modelId).toBe("configured-model-revision");
-    expect(output.metadata.usage.reasoningTokens).toBeNull();
+    expect(output.metadata.usage?.reasoningTokens).toBeNull();
   });
 
   it("keeps instruction-like source content as JSON data and provides no tools", async () => {

@@ -147,6 +147,9 @@ export const findingSchema = z.strictObject({
   if (finding.actionType === "available_but_missing" && change?.operation !== "add") {
     ctx.addIssue({ code: "custom", message: "Utelämnad källinformation kräver ett källanknutet tillägg." });
   }
+  if (change?.operation === "add" && finding.actionType !== "available_but_missing") {
+    ctx.addIssue({ code: "custom", message: "Tillägg kräver information som finns i källan men saknas i utkastet." });
+  }
   if (finding.actionType === "source_information_missing" || finding.actionType === "unclear") {
     if (change !== null || finding.question === null) {
       ctx.addIssue({ code: "custom", message: "Saknad eller oklar information kräver en fråga utan automatiskt ändringsförslag." });
@@ -154,7 +157,7 @@ export const findingSchema = z.strictObject({
   }
 });
 
-const findingsSchema = z.array(findingSchema).max(200).superRefine((findings, ctx) => {
+const findingsSchema = z.array(findingSchema).max(1_000).superRefine((findings, ctx) => {
   checkUnique(findings.map(({ id }) => id), ctx, "Fynd-ID:n");
 });
 export const providerMetadataSchema = z.strictObject({
@@ -170,7 +173,7 @@ export const providerMetadataSchema = z.strictObject({
   }).nullable(),
 });
 export const providerDraftOutputSchema = z.strictObject({ sections: providerSectionsSchema, metadata: providerMetadataSchema });
-export const providerReviewOutputSchema = z.strictObject({ findings: findingsSchema, metadata: providerMetadataSchema });
+export const providerReviewOutputSchema = z.strictObject({ findings: findingsSchema.max(200), metadata: providerMetadataSchema });
 
 export const requestContextSchema = z.strictObject({
   requestId: z.string().uuid(), sourceRevision: revisionSchema, draftRevision: revisionSchema,

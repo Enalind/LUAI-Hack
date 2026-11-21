@@ -1,14 +1,14 @@
 # Implementation status
 
-Updated 21 November 2026. CP0–CP3 implementation complete. Current scope ends at CP3; the actual live smoke is NOT RUN because credentials are unavailable.
+Updated 21 November 2026. CP0–CP4 implementation complete. One live draft smoke and one live review smoke passed. Full clinical/held-out evaluation remains NOT RUN.
 
 | Checkpoint | Status | Evidence / remaining work |
 | --- | --- | --- |
 | CP0 — Repository and runnable skeleton | PASSED | Next.js shell, scripts, lockfile, environment example, ignore rules, server-only configuration and visible prototype/mode labels. Lint, typecheck, 11 unit tests, 2 browser tests and production build passed on Node 24.22.3. Production mock startup and live missing-key error verified. |
 | CP1 — Contracts, source handling, fixtures | PASSED | Shared schemas, bounded request parsing, immutable case/revision/content-scoped source snapshots, exact quote validation, clinician-decision passthrough, two-operation provider contract, prepared mock drafts/reviews and independent D1–D3 answer keys. All 82 deterministic tests, lint, typecheck and production build passed on Node 24.22.3. |
 | CP2 — Complete draft flow in mock mode | PASSED | Case/source/decision forms, POST /api/draft, four editable sections, separate explicit decisions, cited source navigation, missing-information questions, errors/loading, narrow tabs and case/request isolation. 103 deterministic tests, 11 Chromium browser tests, lint, typecheck and production build passed. |
-| CP3 — Live draft provider | PASSED | Implementation/software checks passed: direct Anthropic SDK structured draft, fixed prompt version, output/deadline/retry limits, safe errors, usage metadata and explicit smoke command. 137 deterministic tests, 11 mock browser tests, lint, typecheck and production build passed. Actual live smoke NOT RUN: no key. |
-| CP4 — Review and findings | NOT STARTED | |
+| CP3 — Live draft provider | PASSED | Direct Anthropic structured draft, versioned prompt, output/deadline/retry limits, safe errors and usage metadata. Prior checks: 137 deterministic tests, 11 mock browser tests, lint, typecheck and build passed. Follow-up actual live D1 smoke PASSED: 13,219 ms, 4,262 tokens, seven valid references and unchanged clinician decisions. |
+| CP4 — Review and findings | PASSED | Validated review endpoint, code checks plus separate mock/live semantic review, conservative deduplication, finding/proposal/question cards and evidence/target navigation. 181 deterministic tests, 20 mock browser tests, lint, typecheck and build passed. CP4 used one live review, zero live drafts and no retries; known work omission detected. |
 | CP5 — Editing, revisions, export | NOT STARTED | |
 | CP6 — Acceptance, evaluation, deployment readiness | NOT STARTED | |
 
@@ -32,4 +32,10 @@ CP3 changed areas: `lib/server/live-provider.ts`, versioned prompts/narrative ou
 
 CP3 verification: 34 new deterministic tests exercise actual SDK transport parsing with stub Anthropic responses; total suite 137. Mock browser flows remain green. A production shell with a synthetic key showed live mode and an enabled action without making a model request; key markers were absent from the page, health response and public bundles. Repository credential-pattern scan found no matches. See [TEST_REPORT.md](TEST_REPORT.md) and [LIVE_PROVIDER.md](LIVE_PROVIDER.md).
 
-CP3 live smoke: NOT RUN / unavailable credential. `npm run smoke:live` exited 2 with an explicit missing-key message and zero calls. No real model ID, measured live latency, billed usage or Swedish semantic quality is established. This satisfies the checkpoint's explicit unavailable-live exit, not a claim of live demo readiness. CP4–CP6 remain NOT STARTED. No deployment or certificate transmission occurred.
+CP3 live smoke follow-up: PASSED. After the user added a key to ignored `.env`, `npm run smoke:live` ran one D1 draft, no retries/reviews. Provider model `claude-sonnet-5-5`, prompt `swedish-draft-v1`, latency 13,219 ms, input/output/total tokens 2,485/1,777/4,262, reported reasoning tokens 0. All seven references matched their exact source passages, and explicit clinician decisions were unchanged. The earlier missing-key attempt made zero calls.
+
+CP4 changed areas: review route/service, shared provider factory, reusable bounded live execution, `swedish-review-v1` prompt, deterministic integrity/empty-field checks and deduplication, review state/revision guards, finding cards/navigation, mock/transport/state/browser tests and an isolated review smoke command. Bad input reaches no provider. Bad model targets/citations yield incomplete review with retained code findings. Empty findings use limited wording; failures preserve editable text. Source/claim changes and replacement drafts preserve earlier results as stale until rechecked. Suggestions are displayed; accept/dismiss/application/export remain CP5 work.
+
+CP4 live smoke: PASSED with exactly one review call, zero live drafting calls and no retries. The prepared D1 draft had a known lifting-duty omission. Provider model `claude-sonnet-5-5`, prompt `swedish-review-v1`, 12,943 ms, reported input/output/total tokens 5,602/1,526/7,128, including 710 reasoning tokens within output. Two findings returned; the expected omission was detected. The additional work-relationship finding is unadjudicated. No further model requests were made to tune or repeat the probe. All routine checks used mocks/stubs. See [REVIEW.md](REVIEW.md) and [EVALUATION_REPORT.md](EVALUATION_REPORT.md).
+
+CP4 blockers: none. Full clinical/held-out evaluation remains NOT RUN; a positive development probe is not clinical validation. CP5–CP6 remain NOT STARTED. No deployment or certificate transmission occurred.
