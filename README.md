@@ -84,7 +84,7 @@ For a new setup, copy `.env.example` to ignored `.env.local`. An existing ignore
 
 To try live drafting/review locally, set `AI_MODE=live` and a valid `ANTHROPIC_API_KEY` in ignored `.env` or `.env.local`, then restart the app. `ANTHROPIC_MODEL` remains configurable on the server. Each operation uses direct Anthropic structured output, a 12,000-token output cap per model step and a 60-second deadline. Drafting explicitly uses low reasoning effort to leave room for the structured document; review explicitly uses medium reasoning effort for the seven-rule guidance check. A response cut off by the output limit gets a specific Swedish error. Drafting allows at most one short 429/5xx retry; review uses exactly one attempt, with no automatic retries or automatic review after generation. The browser allows 70 seconds for a safe error to return. See [live provider operation](docs/LIVE_PROVIDER.md).
 
-Vercel deployments require explicit `AI_MODE=mock`; live mode on Vercel fails with a configuration error before any provider request. Keep the public demo key-free. Node.js is pinned to `24.x`. See [deployment readiness](docs/DEPLOYMENT.md) for environment, runtime and duration settings. No deployment has occurred.
+Vercel deployments require explicit `AI_MODE=mock` or `AI_MODE=live`. Live mode also requires a server-only `ANTHROPIC_API_KEY`; `ANTHROPIC_MODEL` is optional. Set these in Vercel for Production and/or Preview, then redeploy. Node.js is pinned to `24.x`. See [deployment settings](docs/DEPLOYMENT.md) for environment, runtime, duration and access protection. No deployment has occurred.
 
 ## CP1 modules
 
@@ -106,4 +106,4 @@ CP6 passed 216 deterministic tests, 29 mock browser checks, lint, typecheck and 
 
 The live H1–H3 run completed three cases in six requests: 15/15 draft references and 13/13 review/proposal references matched, with no decision-invariant violation. Source comparison found one symptom omitted from claim text and recovered by review, one review gap missed, and extra clarification requests on the adequate case. These AI-assisted judgments are not clinical validation; see the detailed [evaluation report](docs/EVALUATION_REPORT.md). Prompts were not tuned or rerun after the probe.
 
-No deployment has occurred. The public deployment policy is mock-only; actual Vercel account settings/protection remain unverified until an authorized deployment is inspected. The app is a local prototype, and no clinical effectiveness, time-saving or approval-rate claim is established.
+No deployment has occurred. Both mock and live Vercel modes are supported; actual Vercel account settings/protection remain unverified until a deployment is inspected. The app is a prototype, and no clinical effectiveness, time-saving or approval-rate claim is established.

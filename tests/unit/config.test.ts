@@ -8,11 +8,10 @@ describe("server configuration", () => {
     expect(getServerConfig({})).toEqual({ mode: "mock" });
   });
 
-  it("requires explicit mock mode on Vercel and never exposes a paid live endpoint", () => {
+  it("requires an explicit valid mode on Vercel", () => {
     expect(getServerConfig({ VERCEL: "1", AI_MODE: "mock", ANTHROPIC_API_KEY: "test-only-secret" })).toEqual({ mode: "mock" });
-    for (const mode of [undefined, "live", "invalid"]) {
-      expect(() => getServerConfig({ VERCEL: "1", AI_MODE: mode, ANTHROPIC_API_KEY: "test-only-secret" })).toThrow("Vercel-demot kräver AI_MODE=mock");
-    }
+    expect(() => getServerConfig({ VERCEL: "1", ANTHROPIC_API_KEY: "test-only-secret" })).toThrow("Vercel-demot kräver AI_MODE=mock eller AI_MODE=live.");
+    expect(() => getServerConfig({ VERCEL: "1", AI_MODE: "invalid" })).toThrow("AI_MODE måste vara mock eller live.");
   });
 
   it("does not include unused credentials in mock configuration", () => {
@@ -23,16 +22,18 @@ describe("server configuration", () => {
     expect(() => getServerConfig({ AI_MODE: mode })).toThrow("AI_MODE måste vara mock eller live.");
   });
 
-  it.each([undefined, "", "  "])("rejects live without a usable key", (key) => {
-    expect(() => getServerConfig({ AI_MODE: "live", ANTHROPIC_API_KEY: key })).toThrow(ConfigurationError);
-    expect(() => getServerConfig({ AI_MODE: "live", ANTHROPIC_API_KEY: key })).toThrow("Live-läge kräver ANTHROPIC_API_KEY");
-  });
-
-  it("supports explicit live configuration and the planned default model", () => {
-    expect(getServerConfig({ AI_MODE: "live", ANTHROPIC_API_KEY: "test-only-secret" })).toEqual({
-      mode: "live", apiKey: "test-only-secret", model: "claude-sonnet-5-5",
+  describe.each([undefined, "1"])("live configuration with VERCEL=%s", (vercel) => {
+    it.each([undefined, "", "  "])("rejects live without a usable key (%s)", (key) => {
+      expect(() => getServerConfig({ VERCEL: vercel, AI_MODE: "live", ANTHROPIC_API_KEY: key })).toThrow(ConfigurationError);
+      expect(() => getServerConfig({ VERCEL: vercel, AI_MODE: "live", ANTHROPIC_API_KEY: key })).toThrow("Live-läge kräver ANTHROPIC_API_KEY");
     });
-    expect(getServerConfig({ AI_MODE: "live", ANTHROPIC_API_KEY: "test-only-secret", ANTHROPIC_MODEL: "custom-model" })).toMatchObject({ model: "custom-model" });
+
+    it("supports live configuration with default and custom models", () => {
+      expect(getServerConfig({ VERCEL: vercel, AI_MODE: "live", ANTHROPIC_API_KEY: "test-only-secret" })).toEqual({
+        mode: "live", apiKey: "test-only-secret", model: "claude-sonnet-5-5",
+      });
+      expect(getServerConfig({ VERCEL: vercel, AI_MODE: "live", ANTHROPIC_API_KEY: "test-only-secret", ANTHROPIC_MODEL: "custom-model" })).toMatchObject({ model: "custom-model" });
+    });
   });
 
   it("rejects a blank explicit model without echoing credentials", () => {

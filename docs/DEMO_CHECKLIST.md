@@ -1,6 +1,6 @@
 # Local demo acceptance — CP6
 
-Run `AI_MODE=mock npm run dev`; use fictional D1–D3. The public Vercel configuration is mock-only. There is no deployment or certificate transmission.
+Run `AI_MODE=mock npm run dev`; use fictional D1–D3. Vercel supports explicit mock or live mode; see [deployment settings](DEPLOYMENT.md) for live credentials and verification. The reproducible journeys below use mock mode. There is no deployment or certificate transmission.
 
 ## Reproducible journeys
 

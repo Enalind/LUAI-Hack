@@ -2,6 +2,8 @@
 
 Updated 21 November 2026. CP0–CP6 software implementation complete. Earlier live smokes and the three-case prompt-held-out evaluation completed. The latter used six calls with documented semantic limitations. Independent human/clinical validation remains NOT RUN; no deployment occurred.
 
+Vercel live follow-up: the user requested hosted live AI. Explicit `AI_MODE=live` with a server-only key is now supported alongside mock; this supersedes the historical CP6 mock-only policy below. All 265 deterministic tests, lint, typecheck and a simulated hosted live production build passed without real provider calls. See [current deployment settings](DEPLOYMENT.md) and [verification](TEST_REPORT.md).
+
 | Checkpoint | Status | Evidence / remaining work |
 | --- | --- | --- |
 | CP0 — Repository and runnable skeleton | PASSED | Next.js shell, scripts, lockfile, environment example, ignore rules, server-only configuration and visible prototype/mode labels. Lint, typecheck, 11 unit tests, 2 browser tests and production build passed on Node 24.22.3. Production mock startup and live missing-key error verified. |

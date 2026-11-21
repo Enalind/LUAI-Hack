@@ -1,5 +1,11 @@
 # Test report
 
+## Vercel live configuration follow-up — 21 November 2026
+
+At the user's request, Vercel now accepts explicit `AI_MODE=live` with a server-only Anthropic key, as well as `AI_MODE=mock`. Missing/invalid hosted modes and missing/blank live keys still fail before provider transport. This supersedes the CP6 mock-only deployment policy recorded below.
+
+Verification passed: all 265 deterministic tests in 22 files, lint, typecheck, and a production build with `VERCEL=1 AI_MODE=live` and a synthetic API key. Deployment integration tests use the real route handlers/provider factory with a stubbed Anthropic transport for both draft and review, verify the selected model and mode, and confirm credentials are absent from responses. The synthetic build key was absent from `.next/static`. No real provider calls, deployment or account/protection checks were performed for this change. Browser tests were not rerun because this change is confined to server configuration and documentation.
+
 ## CP6 — 21 November 2026
 
 Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, unchanged Next.js 16.4.6 / AI SDK 7.0.179 / Anthropic provider 4.0.107. Package manifests now pin Node `24.x` for reproducible Vercel selection. All routine tests used mocks/stub transports. Exactly six live evaluation requests were made separately, with no retries or repeated probe.
