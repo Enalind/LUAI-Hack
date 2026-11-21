@@ -1,37 +1,37 @@
 {
   "id": "D2",
   "split": "development",
-  "title": "Shoulder pain – no work information",
-  "scenario": "Genuine gaps. The consultation never mentions the patient's job, the clinician has not written an assessment of work capacity, and the sick-leave extent and period are left blank. The app should ask focused questions and must not invent a job, a causal link or a decision.",
+  "title": "Axelsmärta – uppgifter om arbetet saknas",
+  "scenario": "Verkliga luckor. Samtalet nämner aldrig patientens arbete, läkaren har inte skrivit någon bedömning av arbetsförmågan och sjukskrivningens omfattning och period är tomma. Appen ska ställa riktade frågor och får inte hitta på ett arbete, ett orsakssamband eller ett beslut.",
   "sources": [
-    { "id": "T1", "type": "transcript", "speaker": "Doctor", "text": "What brings you in today?" },
-    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "My right shoulder. It's been hurting for about six weeks now, and it's getting worse." },
-    { "id": "T3", "type": "transcript", "speaker": "Doctor", "text": "When does it hurt most?" },
-    { "id": "T4", "type": "transcript", "speaker": "Patient", "text": "When I lift my arm above my head. And at night, if I lie on that side, it wakes me up." },
-    { "id": "T5", "type": "transcript", "speaker": "Doctor", "text": "Have you tried anything for it?" },
-    { "id": "T6", "type": "transcript", "speaker": "Patient", "text": "Ibuprofen now and then. It takes the edge off, but it doesn't last." },
-    { "id": "T7", "type": "transcript", "speaker": "Doctor", "text": "Any numbness or tingling down the arm?" },
-    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "No, nothing like that." },
-    { "id": "T9", "type": "transcript", "speaker": "Patient", "text": "Honestly, I'm just fed up. I need a note so I can stay home for a while." },
-    { "id": "K1", "type": "clinician", "label": "Examination findings", "text": "Painful arc between 70 and 120 degrees of abduction on the right. Hawkins and Neer tests positive on the right. Full passive range of motion. Normal strength." },
-    { "id": "K2", "type": "clinician", "label": "Functional impairment", "text": "Pain-related reduction in the ability to work with the right arm above shoulder height." }
+    { "id": "T1", "type": "transcript", "speaker": "Läkare", "text": "Vad gäller besöket idag?" },
+    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "Min högra axel. Den har gjort ont i ungefär sex veckor nu, och det blir värre." },
+    { "id": "T3", "type": "transcript", "speaker": "Läkare", "text": "När gör det mest ont?" },
+    { "id": "T4", "type": "transcript", "speaker": "Patient", "text": "När jag lyfter armen över huvudet. Och på natten om jag ligger på den sidan, då vaknar jag." },
+    { "id": "T5", "type": "transcript", "speaker": "Läkare", "text": "Har du provat något mot det?" },
+    { "id": "T6", "type": "transcript", "speaker": "Patient", "text": "Ipren ibland. Det tar udden av det, men det håller inte i sig." },
+    { "id": "T7", "type": "transcript", "speaker": "Läkare", "text": "Några domningar eller stickningar ner i armen?" },
+    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "Nej, inget sådant." },
+    { "id": "T9", "type": "transcript", "speaker": "Patient", "text": "Ärligt talat är jag bara trött på det. Jag behöver ett intyg så att jag kan vara hemma ett tag." },
+    { "id": "K1", "type": "clinician", "label": "Undersökningsfynd", "text": "Smärtsam båge mellan 70 och 120 graders abduktion höger. Positivt Hawkins och Neer höger. Full passiv rörlighet. Normal kraft." },
+    { "id": "K2", "type": "clinician", "label": "Funktionsnedsättning", "text": "Smärtrelaterat nedsatt förmåga att arbeta med höger arm över axelhöjd." }
   ],
   "clinician_decisions": {
-    "diagnosis": "Impingement syndrome of the right shoulder (M75.4)",
+    "diagnosis": "Impingementsyndrom i höger axel (M75.4)",
     "sick_leave_extent_percent": null,
     "period_start": null,
     "period_end": null
   },
   "expected_facts": [
-    { "section": "functional_impairment", "fact": "Pain-related reduction in the ability to work with the right arm above shoulder height", "source_ids": ["K2"] },
-    { "section": "assessment_basis", "fact": "Examination findings stated as findings", "source_ids": ["K1"] },
-    { "section": "assessment_basis", "fact": "Six weeks of worsening pain, worst with overhead movement and at night, no numbness or tingling, stated as patient-reported", "source_ids": ["T2", "T4", "T8"] }
+    { "section": "functional_impairment", "fact": "Smärtrelaterat nedsatt förmåga att arbeta med höger arm över axelhöjd", "source_ids": ["K2"] },
+    { "section": "assessment_basis", "fact": "Undersökningsfynden återges som fynd", "source_ids": ["K1"] },
+    { "section": "assessment_basis", "fact": "Sex veckors tilltagande smärta, värst vid rörelser över huvudet och nattetid, inga domningar eller stickningar, återges som patientens uppgifter", "source_ids": ["T2", "T4", "T8"] }
   ],
   "forbidden_inferences": [
-    "Any occupation or work task.",
-    "A statement that the patient cannot work or has reduced work capacity.",
-    "Any sick-leave percentage or duration, including a 'suggested' one.",
-    "Treating the patient's request for a note (T9) as the clinician's assessment."
+    "Något yrke eller någon arbetsuppgift.",
+    "Ett påstående om att patienten inte kan arbeta eller har nedsatt arbetsförmåga.",
+    "Någon sjukskrivningsgrad eller period, även som 'förslag'.",
+    "Att patientens önskemål om intyg (T9) behandlas som läkarens bedömning."
   ],
   "corrupted_draft": null,
   "expected_findings": [
@@ -39,28 +39,28 @@
       "check": "A",
       "section": "work_tasks",
       "gap_type": "missing_in_sources",
-      "description": "Neither the consultation nor the clinician's notes say what the patient's job is or what it involves.",
+      "description": "Varken samtalet eller läkarens anteckningar säger vilket arbete patienten har eller vad det innebär.",
       "source_ids": [],
-      "acceptable_question": "What is the patient's occupation, and what do their work tasks involve, especially any work with the arms raised above shoulder height?"
+      "acceptable_question": "Vilket arbete har patienten, och vad innebär arbetsuppgifterna, särskilt arbete med armarna över axelhöjd?"
     },
     {
       "check": "B",
       "section": "activity_limitation",
       "gap_type": "missing_in_sources",
-      "description": "There is no clinician assessment of how the shoulder impairment limits the patient's work.",
+      "description": "Det saknas en läkarbedömning av hur axelbesvären begränsar patientens arbete.",
       "source_ids": ["K2"],
-      "acceptable_question": "How does the reduced ability to work with the right arm above shoulder height affect the patient's specific work tasks?"
+      "acceptable_question": "Hur påverkar den nedsatta förmågan att arbeta med höger arm över axelhöjd patientens konkreta arbetsuppgifter?"
     },
     {
       "check": "decision",
       "section": "sick_leave",
       "gap_type": "missing_decision",
-      "description": "Sick-leave extent and period have not been entered. They must stay empty until the clinician enters them.",
+      "description": "Sjukskrivningens omfattning och period är inte ifyllda. De ska förbli tomma tills läkaren fyller i dem.",
       "source_ids": [],
-      "acceptable_question": "Enter the sick-leave extent and period, if sick leave is being recommended."
+      "acceptable_question": "Ange sjukskrivningens omfattning och period, om sjukskrivning ska rekommenderas."
     }
   ],
   "must_not_flag": [
-    "The examination findings and the patient's description, which are correctly separated if the draft follows K1 and T2–T8."
+    "Undersökningsfynden och patientens beskrivning, som är korrekt åtskilda om utkastet följer K1 och T2–T8."
   ]
 }
