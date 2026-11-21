@@ -1,56 +1,56 @@
 {
   "id": "D3",
   "split": "development",
-  "title": "Neck pain – city bus driver",
-  "scenario": "Attribution and negation. The patient denies any loss of feeling. The doctor asks about grip weakness, but the patient never answers and no grip or sensation testing is recorded. (a) Generate a draft: it should keep the denial and infer nothing about grip. (b) Review the corrupted draft, which presents the patient's pain rating as an examination finding and turns the denial and the unanswered question into findings.",
+  "title": "Nacksmärta – stadsbussförare",
+  "scenario": "Attribution och negation. Patienten förnekar känselbortfall. Läkaren frågar om svaghet i greppet, men patienten svarar aldrig och ingen känsel- eller greppkraftsundersökning finns dokumenterad. (a) Generera utkast: förnekandet ska behållas och inget ska antas om greppet. (b) Granska det korrupta utkastet, som framställer patientens smärtskattning som ett undersökningsfynd och gör förnekandet och den obesvarade frågan till fynd.",
   "sources": [
-    { "id": "T1", "type": "transcript", "speaker": "Doctor", "text": "Tell me about your neck." },
-    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "It started about a week ago. I woke up and couldn't turn my head to the right." },
-    { "id": "T3", "type": "transcript", "speaker": "Patient", "text": "When I try to turn it, the pain's about an eight out of ten." },
-    { "id": "T4", "type": "transcript", "speaker": "Doctor", "text": "Does it go down into your arm?" },
-    { "id": "T5", "type": "transcript", "speaker": "Patient", "text": "It sort of aches down towards my right shoulder blade, but I haven't lost any feeling in my arm." },
-    { "id": "T6", "type": "transcript", "speaker": "Doctor", "text": "Have you noticed any weakness in your grip?" },
-    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "What I really notice is at work. I drive a city bus, and I have to keep checking my mirrors and looking over my shoulder at every stop." },
-    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "My shifts are about eight hours, and I can't turn my head far enough to check the right side safely." },
-    { "id": "K1", "type": "clinician", "label": "Examination findings", "text": "Cervical rotation to the right limited to approximately 20 degrees by pain; rotation to the left normal. Tenderness over the right upper trapezius and levator scapulae. Spurling's test negative." },
-    { "id": "K2", "type": "clinician", "label": "Functional impairment", "text": "Pain-related restriction of cervical rotation to the right." },
-    { "id": "K3", "type": "clinician", "label": "Assessment of work capacity", "text": "The patient cannot currently rotate the neck far enough to the right to check mirrors and blind spots safely. Driving a bus requires this throughout the shift, so the patient is assessed as unable to perform their work during this period." }
+    { "id": "T1", "type": "transcript", "speaker": "Läkare", "text": "Berätta om nacken." },
+    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "Det började för ungefär en vecka sedan. Jag vaknade och kunde inte vrida huvudet åt höger." },
+    { "id": "T3", "type": "transcript", "speaker": "Patient", "text": "När jag försöker vrida det är smärtan ungefär en åtta av tio." },
+    { "id": "T4", "type": "transcript", "speaker": "Läkare", "text": "Strålar det ut i armen?" },
+    { "id": "T5", "type": "transcript", "speaker": "Patient", "text": "Det värker liksom ner mot höger skulderblad, men jag har inte tappat någon känsel i armen." },
+    { "id": "T6", "type": "transcript", "speaker": "Läkare", "text": "Har du märkt någon svaghet i greppet?" },
+    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "Det jag verkligen märker är på jobbet. Jag kör stadsbuss och måste hela tiden kolla speglarna och titta över axeln vid varje hållplats." },
+    { "id": "T8", "type": "transcript", "speaker": "Patient", "text": "Mina pass är ungefär åtta timmar, och jag kan inte vrida huvudet tillräckligt för att kolla höger sida säkert." },
+    { "id": "K1", "type": "clinician", "label": "Undersökningsfynd", "text": "Rotation av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta; rotation åt vänster normal. Ömhet över höger övre trapezius och levator scapulae. Spurlings test negativt." },
+    { "id": "K2", "type": "clinician", "label": "Funktionsnedsättning", "text": "Smärtrelaterat inskränkt rotation av halsryggen åt höger." },
+    { "id": "K3", "type": "clinician", "label": "Bedömning av arbetsförmåga", "text": "Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln. Arbete som bussförare kräver detta under hela arbetspasset, och patienten bedöms därför inte kunna utföra sitt arbete under perioden." }
   ],
   "clinician_decisions": {
-    "diagnosis": "Cervicalgia (M54.2)",
+    "diagnosis": "Cervikalgi (M54.2)",
     "sick_leave_extent_percent": 100,
     "period_start": "2026-11-23",
     "period_end": "2026-12-06"
   },
   "expected_facts": [
-    { "section": "work_tasks", "fact": "City bus driver on shifts of about eight hours, repeatedly checking mirrors and looking over the shoulder at every stop", "source_ids": ["T7", "T8"] },
-    { "section": "functional_impairment", "fact": "Pain-related restriction of cervical rotation to the right", "source_ids": ["K2"] },
-    { "section": "activity_limitation", "fact": "Cannot rotate the neck far enough to the right to check mirrors and blind spots safely, which bus driving requires throughout the shift", "source_ids": ["K3"] },
-    { "section": "assessment_basis", "fact": "Examination findings stated as findings", "source_ids": ["K1"] },
-    { "section": "assessment_basis", "fact": "Pain of about 8/10 on rotation stated as patient-reported", "source_ids": ["T3"] },
-    { "section": "assessment_basis", "fact": "Patient denies any loss of feeling in the arm (denial kept as a denial)", "source_ids": ["T5"] }
+    { "section": "work_tasks", "fact": "Stadsbussförare med pass på cirka åtta timmar, kontrollerar upprepade gånger speglar och tittar över axeln vid varje hållplats", "source_ids": ["T7", "T8"] },
+    { "section": "functional_impairment", "fact": "Smärtrelaterat inskränkt rotation av halsryggen åt höger", "source_ids": ["K2"] },
+    { "section": "activity_limitation", "fact": "Kan inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbetet kräver under hela passet", "source_ids": ["K3"] },
+    { "section": "assessment_basis", "fact": "Undersökningsfynden återges som fynd", "source_ids": ["K1"] },
+    { "section": "assessment_basis", "fact": "Smärta cirka 8/10 vid rotation återges som patientens uppgift", "source_ids": ["T3"] },
+    { "section": "assessment_basis", "fact": "Patienten förnekar känselbortfall i armen (förnekandet behålls som förnekande)", "source_ids": ["T5"] }
   ],
   "forbidden_inferences": [
-    "Reduced sensation in the arm (the patient denies it).",
-    "Reduced or normal grip strength (the question was never answered and nothing was tested).",
-    "A normal neurological examination (only Spurling's test is recorded).",
-    "Presenting the pain rating (T3) as an examination finding."
+    "Nedsatt känsel i armen (patienten förnekar det).",
+    "Nedsatt eller normal greppkraft (frågan besvarades aldrig och inget undersöktes).",
+    "Normalt neurologstatus (endast Spurlings test är dokumenterat).",
+    "Att smärtskattningen (T3) framställs som ett undersökningsfynd."
   ],
   "corrupted_draft": {
     "sections": [
       { "key": "work_tasks", "claims": [
-        { "id": "C1", "text": "The patient works as a city bus driver on shifts of about eight hours, which involve repeatedly checking mirrors and looking over the shoulder at every stop.", "source_ids": ["T7", "T8"] }
+        { "id": "C1", "text": "Patienten arbetar som stadsbussförare med arbetspass på cirka åtta timmar, vilket innebär att upprepade gånger kontrollera speglar och titta över axeln vid varje hållplats.", "source_ids": ["T7", "T8"] }
       ]},
       { "key": "functional_impairment", "claims": [
-        { "id": "C2", "text": "Pain-related restriction of cervical rotation to the right.", "source_ids": ["K2"] }
+        { "id": "C2", "text": "Smärtrelaterat inskränkt rotation av halsryggen åt höger.", "source_ids": ["K2"] }
       ]},
       { "key": "activity_limitation", "claims": [
-        { "id": "C3", "text": "The patient cannot currently rotate the neck far enough to the right to check mirrors and blind spots safely, which driving a bus requires throughout the shift.", "source_ids": ["K3"] }
+        { "id": "C3", "text": "Patienten kan i nuläget inte vrida nacken tillräckligt åt höger för att säkert kontrollera speglar och döda vinkeln, vilket arbete som bussförare kräver under hela passet.", "source_ids": ["K3"] }
       ]},
       { "key": "assessment_basis", "claims": [
-        { "id": "C4", "text": "On examination, cervical rotation to the right is limited to approximately 20 degrees by pain, with tenderness over the right upper trapezius and levator scapulae.", "source_ids": ["K1"] },
-        { "id": "C5", "text": "Examination shows pain of 8/10 on rotation.", "source_ids": ["K1"] },
-        { "id": "C6", "text": "Reduced sensation and reduced grip strength in the right arm were noted.", "source_ids": ["T5", "T6"] }
+        { "id": "C4", "text": "Vid undersökning är rotationen av halsryggen åt höger begränsad till cirka 20 grader på grund av smärta, med ömhet över höger övre trapezius och levator scapulae.", "source_ids": ["K1"] },
+        { "id": "C5", "text": "Undersökningen visar smärta 8/10 vid rotation.", "source_ids": ["K1"] },
+        { "id": "C6", "text": "Nedsatt känsel och nedsatt greppkraft i höger arm noterades.", "source_ids": ["T5", "T6"] }
       ]}
     ]
   },
@@ -59,22 +59,22 @@
       "check": "C",
       "target_claim_id": "C5",
       "gap_type": "wrong_attribution",
-      "description": "The 8/10 pain rating is the patient's own report (T3), not an examination finding. K1 contains no pain rating.",
+      "description": "Smärtskattningen 8/10 är patientens egen uppgift (T3), inte ett undersökningsfynd. K1 innehåller ingen smärtskattning.",
       "source_ids": ["T3", "K1"],
-      "acceptable_suggestion": "The patient reports pain of about 8/10 when trying to turn the head."
+      "acceptable_suggestion": "Patienten uppger smärta på cirka 8/10 vid försök att vrida huvudet."
     },
     {
       "check": "D",
       "target_claim_id": "C6",
       "gap_type": "contradicts_source",
-      "description": "The patient explicitly denies any loss of feeling (T5). The grip question (T6) was never answered, and K1 records no sensation or grip testing.",
+      "description": "Patienten förnekar uttryckligen känselbortfall (T5). Frågan om greppkraft (T6) besvarades aldrig, och K1 dokumenterar ingen undersökning av känsel eller greppkraft.",
       "source_ids": ["T5", "T6", "K1"],
-      "acceptable_suggestion": "The patient reports aching towards the right shoulder blade but no loss of feeling in the arm.",
-      "acceptable_question": "Were sensation or grip strength examined? If so, enter the result in the examination findings."
+      "acceptable_suggestion": "Patienten beskriver värk ner mot höger skulderblad men uppger att hen inte har tappat någon känsel i armen.",
+      "acceptable_question": "Undersöktes känsel eller greppkraft? Ange i så fall resultatet under undersökningsfynd."
     }
   ],
   "must_not_flag": [
-    "C1–C4: supported by the sources and correctly attributed.",
-    "The clinician decisions (100 %, 2026-11-23 to 2026-12-06)."
+    "C1–C4: stöds av underlaget och är korrekt attribuerade.",
+    "Läkarens beslut (100 %, 2026-11-23 till och med 2026-12-06)."
   ]
 }

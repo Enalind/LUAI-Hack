@@ -1,62 +1,62 @@
 {
   "id": "D1",
   "split": "development",
-  "title": "Low back pain – warehouse order picker",
-  "scenario": "Adequate sources. (a) Generate a draft: it should contain the concrete work duties and keep patient reports attributed. (b) Review the corrupted draft, which reduces the duties to 'works in a warehouse': the review should recover the detail from the sources.",
+  "title": "Ländryggssmärta – orderplockare på lager",
+  "scenario": "Fullständigt underlag. (a) Generera utkast: det ska innehålla de konkreta arbetsuppgifterna och hålla isär patientens uppgifter och läkarens fynd. (b) Granska det korrupta utkastet, som förenklar arbetsuppgifterna till 'arbetar på ett lager': granskningen ska hämta tillbaka detaljerna från underlaget.",
   "sources": [
-    { "id": "T1", "type": "transcript", "speaker": "Doctor", "text": "So, what happened?" },
-    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "I felt something go in my back on Monday when I was lifting a box at work. It's been really painful in my lower back ever since." },
-    { "id": "T3", "type": "transcript", "speaker": "Doctor", "text": "Does the pain go down into your legs?" },
-    { "id": "T4", "type": "transcript", "speaker": "Patient", "text": "No, it's mostly just in my lower back. No numbness." },
-    { "id": "T5", "type": "transcript", "speaker": "Doctor", "text": "What do you do for work?" },
-    { "id": "T6", "type": "transcript", "speaker": "Patient", "text": "I'm an order picker at a warehouse. I'm lifting boxes most of the day, anything from five to twenty kilos." },
-    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "I'm on my feet walking a lot as well, and I'm constantly bending down to the bottom shelves." },
-    { "id": "T8", "type": "transcript", "speaker": "Doctor", "text": "Have you tried working since it happened?" },
-    { "id": "T9", "type": "transcript", "speaker": "Patient", "text": "I tried on Tuesday, but I had to stop after a few minutes because of the pain." },
-    { "id": "T10", "type": "transcript", "speaker": "Patient", "text": "Sitting is okay for a while, and I can manage short walks." },
-    { "id": "T11", "type": "transcript", "speaker": "Doctor", "text": "Are there any lighter duties you could do at work?" },
-    { "id": "T12", "type": "transcript", "speaker": "Patient", "text": "Not really. Everyone in the warehouse picks orders. There's no office work." },
-    { "id": "K1", "type": "clinician", "label": "Examination findings", "text": "Reduced lumbar range of motion; forward flexion limited to approximately 30 degrees by pain. Paravertebral tenderness at L3–L5. Neurological examination normal; straight leg raise negative bilaterally." },
-    { "id": "K2", "type": "clinician", "label": "Functional impairment", "text": "Pain-related reduction in lumbar mobility and load tolerance." },
-    { "id": "K3", "type": "clinician", "label": "Assessment of work capacity", "text": "The patient is currently unable to perform repeated lifting or work in a forward-bent position. Work as an order picker consists mainly of lifting 5–20 kg and bending, and is therefore assessed as not possible during this period. The assessment is based on the examination findings and the patient's description of the job." }
+    { "id": "T1", "type": "transcript", "speaker": "Läkare", "text": "Vad är det som har hänt?" },
+    { "id": "T2", "type": "transcript", "speaker": "Patient", "text": "Jag kände att det small till i ryggen i måndags när jag lyfte en låda på jobbet. Sedan dess har jag haft riktigt ont i nedre delen av ryggen." },
+    { "id": "T3", "type": "transcript", "speaker": "Läkare", "text": "Strålar smärtan ner i benen?" },
+    { "id": "T4", "type": "transcript", "speaker": "Patient", "text": "Nej, det sitter mest i ländryggen. Inga domningar." },
+    { "id": "T5", "type": "transcript", "speaker": "Läkare", "text": "Vad jobbar du med?" },
+    { "id": "T6", "type": "transcript", "speaker": "Patient", "text": "Jag är orderplockare på ett lager. Jag lyfter lådor större delen av dagen, allt från fem till tjugo kilo." },
+    { "id": "T7", "type": "transcript", "speaker": "Patient", "text": "Jag går mycket också, och jag böjer mig hela tiden ner till de nedersta hyllorna." },
+    { "id": "T8", "type": "transcript", "speaker": "Läkare", "text": "Har du försökt jobba sedan det hände?" },
+    { "id": "T9", "type": "transcript", "speaker": "Patient", "text": "Jag försökte i tisdags, men jag fick avbryta efter några minuter för att det gjorde så ont." },
+    { "id": "T10", "type": "transcript", "speaker": "Patient", "text": "Att sitta går okej en stund, och jag klarar korta promenader." },
+    { "id": "T11", "type": "transcript", "speaker": "Läkare", "text": "Finns det några lättare arbetsuppgifter du skulle kunna göra?" },
+    { "id": "T12", "type": "transcript", "speaker": "Patient", "text": "Inte direkt. Alla på lagret plockar, och det finns inga kontorsuppgifter." },
+    { "id": "K1", "type": "clinician", "label": "Undersökningsfynd", "text": "Nedsatt rörlighet i ländryggen, framåtböjning begränsad till cirka 30 grader på grund av smärta. Palpationsöm paravertebralt L3–L5. Neurologstatus utan anmärkning, Lasègue negativ bilateralt." },
+    { "id": "K2", "type": "clinician", "label": "Funktionsnedsättning", "text": "Smärtrelaterat nedsatt rörlighet och belastningstålighet i ländryggen." },
+    { "id": "K3", "type": "clinician", "label": "Bedömning av arbetsförmåga", "text": "Patienten kan i nuläget inte utföra upprepade lyft eller arbete i framåtböjd ställning. Arbetet som orderplockare består huvudsakligen av lyft på 5–20 kg och böjning och bedöms därför inte kunna utföras under perioden. Bedömningen grundar sig på undersökningsfynden och patientens beskrivning av arbetet." }
   ],
   "clinician_decisions": {
-    "diagnosis": "Low back pain (M54.5)",
+    "diagnosis": "Lumbago (M54.5)",
     "sick_leave_extent_percent": 100,
     "period_start": "2026-11-16",
     "period_end": "2026-11-29"
   },
   "expected_facts": [
-    { "section": "work_tasks", "fact": "Order picker at a warehouse", "source_ids": ["T6"] },
-    { "section": "work_tasks", "fact": "Lifts boxes of 5–20 kg for most of the day", "source_ids": ["T6"] },
-    { "section": "work_tasks", "fact": "Walks a lot and bends repeatedly to low shelves", "source_ids": ["T7"] },
-    { "section": "work_tasks", "fact": "No lighter duties are available", "source_ids": ["T12"] },
-    { "section": "functional_impairment", "fact": "Pain-related reduction in lumbar mobility and load tolerance", "source_ids": ["K2"] },
-    { "section": "activity_limitation", "fact": "Unable to perform repeated lifting or forward-bent work, which the job mainly consists of", "source_ids": ["K3"] },
-    { "section": "assessment_basis", "fact": "Examination findings stated as findings", "source_ids": ["K1"] },
-    { "section": "assessment_basis", "fact": "Onset, absence of radiation and the failed work attempt stated as patient-reported", "source_ids": ["T2", "T4", "T9"] }
+    { "section": "work_tasks", "fact": "Orderplockare på lager", "source_ids": ["T6"] },
+    { "section": "work_tasks", "fact": "Lyfter lådor på 5–20 kg större delen av arbetsdagen", "source_ids": ["T6"] },
+    { "section": "work_tasks", "fact": "Går mycket och böjer sig upprepade gånger ner till låga hyllor", "source_ids": ["T7"] },
+    { "section": "work_tasks", "fact": "Lättare arbetsuppgifter finns inte", "source_ids": ["T12"] },
+    { "section": "functional_impairment", "fact": "Smärtrelaterat nedsatt rörlighet och belastningstålighet i ländryggen", "source_ids": ["K2"] },
+    { "section": "activity_limitation", "fact": "Kan inte utföra upprepade lyft eller arbete i framåtböjd ställning, vilket arbetet huvudsakligen består av", "source_ids": ["K3"] },
+    { "section": "assessment_basis", "fact": "Undersökningsfynden återges som fynd", "source_ids": ["K1"] },
+    { "section": "assessment_basis", "fact": "Debut, avsaknad av utstrålning och det avbrutna arbetsförsöket återges som patientens uppgifter", "source_ids": ["T2", "T4", "T9"] }
   ],
   "forbidden_inferences": [
-    "Radiating leg pain, numbness or any neurological deficit.",
-    "Any sick-leave extent or period other than the clinician's decision.",
-    "Presenting the failed work attempt (T9) as something the doctor observed.",
-    "Rehabilitation or return-to-work plans that are not in the sources."
+    "Utstrålning till benen, domningar eller något neurologiskt bortfall.",
+    "Annan sjukskrivningsgrad eller period än läkarens beslut.",
+    "Att det avbrutna arbetsförsöket (T9) framställs som något läkaren har observerat.",
+    "Rehabiliterings- eller återgångsplaner som inte finns i underlaget."
   ],
   "corrupted_draft": {
     "sections": [
       { "key": "work_tasks", "claims": [
-        { "id": "C1", "text": "The patient works in a warehouse.", "source_ids": ["T6"] }
+        { "id": "C1", "text": "Patienten arbetar på ett lager.", "source_ids": ["T6"] }
       ]},
       { "key": "functional_impairment", "claims": [
-        { "id": "C2", "text": "Pain-related reduction in lumbar mobility and load tolerance.", "source_ids": ["K2"] }
+        { "id": "C2", "text": "Smärtrelaterat nedsatt rörlighet och belastningstålighet i ländryggen.", "source_ids": ["K2"] }
       ]},
       { "key": "activity_limitation", "claims": [
-        { "id": "C3", "text": "The patient is currently unable to perform repeated lifting or work in a forward-bent position, which the job mainly consists of.", "source_ids": ["K3"] },
-        { "id": "C4", "text": "The patient reports having had to stop an attempt to work after a few minutes because of pain.", "source_ids": ["T9"] }
+        { "id": "C3", "text": "Patienten kan i nuläget inte utföra upprepade lyft eller arbete i framåtböjd ställning, vilket arbetet huvudsakligen består av.", "source_ids": ["K3"] },
+        { "id": "C4", "text": "Patienten uppger att ett arbetsförsök fick avbrytas efter några minuter på grund av smärta.", "source_ids": ["T9"] }
       ]},
       { "key": "assessment_basis", "claims": [
-        { "id": "C5", "text": "On examination, lumbar range of motion is reduced, with forward flexion limited to approximately 30 degrees by pain, and there is paravertebral tenderness at L3–L5. Neurological examination is normal.", "source_ids": ["K1"] },
-        { "id": "C6", "text": "The patient reports sudden onset of lower back pain on Monday while lifting a box at work, with no radiation to the legs and no numbness.", "source_ids": ["T2", "T4"] }
+        { "id": "C5", "text": "Vid undersökning ses nedsatt rörlighet i ländryggen med framåtböjning begränsad till cirka 30 grader på grund av smärta samt palpationsömhet paravertebralt L3–L5. Neurologstatus utan anmärkning.", "source_ids": ["K1"] },
+        { "id": "C6", "text": "Patienten beskriver akut debut av ländryggssmärta i måndags vid lyft av en låda på arbetet, utan utstrålning till benen och utan domningar.", "source_ids": ["T2", "T4"] }
       ]}
     ]
   },
@@ -65,13 +65,13 @@
       "check": "A",
       "target_claim_id": "C1",
       "gap_type": "omitted_from_draft",
-      "description": "The work duties are vague. The sources describe them concretely: order picker, lifting 5–20 kg for most of the day, frequent bending to low shelves, and no lighter duties available.",
+      "description": "Arbetsuppgifterna är vagt beskrivna. Underlaget beskriver dem konkret: orderplockare, lyft på 5–20 kg större delen av dagen, upprepad böjning mot låga hyllor och inga lättare arbetsuppgifter.",
       "source_ids": ["T6", "T7", "T12"],
-      "acceptable_suggestion": "The patient works as an order picker at a warehouse, lifting boxes of 5–20 kg for most of the working day, walking a lot and repeatedly bending down to low shelves. No lighter duties are available at the workplace."
+      "acceptable_suggestion": "Patienten arbetar som orderplockare på ett lager och lyfter lådor på 5–20 kg under större delen av arbetsdagen, går mycket och böjer sig upprepade gånger ner till låga hyllor. Lättare arbetsuppgifter finns inte på arbetsplatsen."
     }
   ],
   "must_not_flag": [
-    "C5 and C6: findings and patient reports are already correctly separated.",
-    "The clinician decisions (100 %, 2026-11-16 to 2026-11-29)."
+    "C5 och C6: fynd och patientens uppgifter är redan korrekt åtskilda.",
+    "Läkarens beslut (100 %, 2026-11-16 till och med 2026-11-29)."
   ]
 }
