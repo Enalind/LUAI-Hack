@@ -9,12 +9,13 @@ type Props = {
   busy: boolean;
   hasDraft: boolean;
   generationAvailable: boolean;
+  mode: "mock" | "live" | null;
   onCaseChange: (caseId: string) => void;
   onChange: (input: SourceInput) => void;
   onGenerate: () => void;
 };
 
-export function SourceInputForm({ caseId, input, busy, hasDraft, generationAvailable, onCaseChange, onChange, onGenerate }: Props) {
+export function SourceInputForm({ caseId, input, busy, hasDraft, generationAvailable, mode, onCaseChange, onChange, onGenerate }: Props) {
   const decision = input.explicitDecision;
   function updateDecision(change: Partial<ExplicitDecision>) {
     onChange({ ...input, explicitDecision: { ...decision, ...change } });
@@ -66,7 +67,7 @@ export function SourceInputForm({ caseId, input, busy, hasDraft, generationAvail
         {busy ? "Skapar utkast…" : hasDraft ? "Ersätt med nytt utkast" : "Skapa intygsutkast"}
       </button>
       {hasDraft && <p className="input-help">Ett nytt utkast ersätter dina ändringar i intygsfälten.</p>}
-      <p className="input-help">Mock-läget använder förberedda svar för exemplens oförändrade besöksunderlag och bedömning. Läkarens beslut kan ändras.</p>
+      <p className="input-help">{mode === "live" ? "Live-läget skickar det fiktiva underlaget till Anthropic. Generering kan medföra en kostnad. Granska alltid text och källor." : "Mock-läget använder förberedda svar för exemplens oförändrade besöksunderlag och bedömning. Läkarens beslut kan ändras."}</p>
     </form>
   );
 }

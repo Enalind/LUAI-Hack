@@ -5,6 +5,8 @@ import { developmentCases } from "../../fixtures/development/cases";
 import { apiErrorSchema, draftResponseSchema, MAX_REQUEST_BYTES } from "../../lib/schemas";
 import { createDraftHandler } from "../../lib/server/draft-service";
 import { MockProvider } from "../../lib/server/mock-provider";
+import { LiveProvider } from "../../lib/server/live-provider";
+import { ApplicationError } from "../../lib/server/errors";
 
 const context = { requestId: "d3faee2b-b031-4c54-8bdc-d572a17d19b1", sourceRevision: 0, draftRevision: 4 };
 const validBody = { ...context, caseId: "D1", input: developmentCases[0].input };
@@ -58,6 +60,7 @@ describe("POST /api/draft", () => {
 
   it("never falls back to mock in live mode, with or without a key", async () => {
     const draft = vi.spyOn(MockProvider.prototype, "draft");
+    const live = vi.spyOn(LiveProvider.prototype, "draft").mockRejectedValue(new ApplicationError("PROVIDER_UNAVAILABLE", "Modelltjänsten är otillgänglig.", 503, true));
     vi.stubEnv("AI_MODE", "live");
     for (const key of ["", "test-only-secret"]) {
       vi.stubEnv("ANTHROPIC_API_KEY", key);
@@ -69,6 +72,7 @@ describe("POST /api/draft", () => {
       expect(JSON.stringify(body)).not.toContain("test-only-secret");
     }
     expect(draft).not.toHaveBeenCalled();
+    expect(live).toHaveBeenCalledOnce();
   });
 
   it("masks unexpected provider errors and retains the request ID", async () => {

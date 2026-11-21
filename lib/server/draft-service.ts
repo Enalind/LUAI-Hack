@@ -3,6 +3,7 @@ import { draftRequestSchema, draftResponseSchema, type DraftResponse } from "../
 import { ConfigurationError, getServerConfig } from "./config";
 import { ApplicationError } from "./errors";
 import { MockProvider } from "./mock-provider";
+import { LiveProvider } from "./live-provider";
 import type { CertificateProvider } from "./provider";
 import { validateDraftOutput } from "./provider-output";
 import { readJsonRequest } from "./request-body";
@@ -10,10 +11,7 @@ import { createSourceSnapshot } from "./source-snapshot";
 
 function getDraftProvider(): CertificateProvider {
   const config = getServerConfig();
-  if (config.mode === "live") {
-    throw new ApplicationError("PROVIDER_UNAVAILABLE", "Live-generering är ännu inte tillgänglig. Välj AI_MODE=mock på servern för att använda de fiktiva exemplen.", 503);
-  }
-  return new MockProvider();
+  return config.mode === "live" ? new LiveProvider(config) : new MockProvider();
 }
 
 /** Validate before selecting or calling any provider. Injection is server/test-only. */
@@ -25,7 +23,7 @@ export function createDraftHandler(providerFactory: () => CertificateProvider = 
       const input = await readJsonRequest(request, draftRequestSchema);
       requestId = input.requestId;
       const snapshot = createSourceSnapshot(input.caseId, input.input);
-      const output = await providerFactory().draft(snapshot);
+      const output = await providerFactory().draft(snapshot, { signal: request.signal });
       const validated = validateDraftOutput(snapshot, output);
       const result: DraftResponse = draftResponseSchema.parse({
         requestId, sourceRevision: input.sourceRevision, draftRevision: input.draftRevision,

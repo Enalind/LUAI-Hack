@@ -1,5 +1,27 @@
 # Test report
 
+## CP3 — 21 November 2026
+
+Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6, AI SDK 7.0.179 and direct Anthropic provider 4.0.107. No dependency upgrades or real provider credentials were used. Normal tests do not load local env files or run the opt-in live test.
+
+| Command / verification | Actual outcome |
+| --- | --- |
+| `npm test` | PASSED; 8 files, 137 tests (34 new CP3 transport scenarios), 461 ms. All provider network responses are stubbed. |
+| `npm run lint` | PASSED; zero errors/warnings. |
+| `npm run typecheck` | PASSED. |
+| `npm run test:e2e` | PASSED; 11 Chromium tests in mock mode, 5.0 seconds; no provider key/model calls. |
+| `npm run build` | PASSED; compiled and generated production routes using mock mode and a synthetic build-time key marker. |
+| `npm run smoke:live` | NOT RUN; wrapper exited 2 because ANTHROPIC_API_KEY is unavailable. Zero calls; no live latency/usage/model quality reported. |
+| Configured production live-mode shell | PASSED with a synthetic key: live label visible, draft action enabled, page/health response contain no credential marker, health reports CP3. No generation submitted. |
+| Credential-isolation checks | PASSED; 12 public build files scanned, no synthetic credential/test marker hits. Tracked/unignored source scan found no Anthropic-key-pattern matches. `.env.local` and `.local/live-smoke-result.json` are ignored. This is a targeted scan plus the server-only import boundary, not an exhaustive secret audit. |
+| `git diff --check` | PASSED. Product/implementation plans and dependency lockfile unchanged. |
+
+The new tests exercise actual installed AI SDK and Anthropic adapter parsing against stubbed HTTP responses: native structured-output request shape, direct endpoint/auth header, model configuration, prompt/data separation and absence of tools; successful metadata including reasoning tokens and unknown usage as null; refusal, truncation and unexpected finish reasons even with otherwise valid JSON; malformed/extra output; missing/unknown/foreign/altered/empty references; and empty fields without gaps. They verify bounded retry on 429/5xx, persistent failure, non-retried 401/403/404, Retry-After seconds/milliseconds/HTTP dates, long-delay refusal, remaining-budget handling, wait timing, timeout despite an uncooperative transport, and request cancellation before/after HTTP begins. Safe endpoint errors and absence of console logs/provider bodies/keys are asserted.
+
+These tests do not prove semantic source support, clinical correctness or resistance to every source injection. The live provider rejects reference-integrity failures, while the existing mock contract can return separate integrity findings. No successful empty response or mock fallback replaces a live failure. Existing draft/edit retention tests and browser flows remain green. The production shell check validates configuration/UI isolation only; a synthetic key does not establish account or model access. Its server was stopped after verification.
+
+SDK APIs were verified against installed docs/types and [structured-output documentation](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data), [direct Anthropic documentation](https://ai-sdk.dev/providers/ai-sdk-providers/anthropic), and [generation limits/cancellation documentation](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text). No actual live smoke/evaluation, live review, deployment access-protection check or Vercel plan verification occurred.
+
 ## CP2 — 21 November 2026
 
 Environment: macOS arm64, Node 24.22.3 LTS, npm 11.18.0, Next.js 16.4.6. Browser tests run an automatically launched mock development server with an empty provider key. Live-mode handler tests use only an empty or synthetic test key and make no external requests.

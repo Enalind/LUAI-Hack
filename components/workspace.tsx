@@ -58,7 +58,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
     const context: RequestContext = { requestId: crypto.randomUUID(), sourceRevision: state.input.sourceRevision, draftRevision: state.draftRevision };
     const controller = new AbortController();
     controllerRef.current = controller;
-    const timer = window.setTimeout(() => controller.abort("timeout"), 60_000);
+    const timer = window.setTimeout(() => controller.abort("timeout"), 70_000);
     dispatch({ type: "requested", context });
     setSelection(null);
     setActiveTab("draft");
@@ -100,7 +100,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
       <strong>{state.status === "loading" ? "Skapar utkast…" : state.result ? "Utkast skapat · ej granskat" : "Inget utkast skapat"}</strong>
       <span>Källversion {state.input.sourceRevision} · Utkastversion {state.draftRevision}</span>
     </div>
-    {(configurationError || mode === "live") && <div className="error" role="alert" aria-label="Konfigurationsfel"><strong>Generering är inte tillgänglig</strong><p>{configurationError ?? "Live-generering är ännu inte tillgänglig. Använd mock-läge för de fiktiva exemplen."}</p></div>}
+    {configurationError && <div className="error" role="alert" aria-label="Konfigurationsfel"><strong>Generering är inte tillgänglig</strong><p>{configurationError}</p></div>}
     {state.error && <div className="error" role="alert" aria-label="Utkastfel"><strong>Utkastet kunde inte skapas</strong><p>{state.error}</p></div>}
     {staleSource && <div className="stale-notice" role="note">Underlaget har ändrats. Utkastet och dess källpassager hör till föregående källversion. Skapa ett nytt utkast för att använda ändringarna.</div>}
 
@@ -117,7 +117,7 @@ export function Workspace({ mode, configurationError }: { mode: "mock" | "live" 
         <div className="panel-heading"><h2 id="source-title">Underlag</h2><span className="tag">Fiktivt fall</span></div>
         <p className="panel-description">Besöksunderlag och läkarens bedömning hålls åtskilda.</p>
         <SourceInputForm caseId={state.caseId} input={state.input} busy={state.status === "loading"} hasDraft={!!state.result}
-          generationAvailable={mode === "mock"} onCaseChange={changeCase} onChange={changeSource} onGenerate={generate} />
+          generationAvailable={mode !== null} mode={mode} onCaseChange={changeCase} onChange={changeSource} onGenerate={generate} />
         <SourcePanel snapshot={state.result?.snapshot ?? null} selectedSourceId={selection?.id ?? null} stale={staleSource} />
       </section>
       <section className="panel draft-panel" {...panelProps("draft")} aria-busy={state.status === "loading"}>

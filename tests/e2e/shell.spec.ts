@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("mock shell renders without a provider key", async ({ page, request }) => {
   const health = await request.get("/api/health");
   expect(health.ok()).toBeTruthy();
-  expect(await health.json()).toEqual({ status: "ok", mode: "mock", checkpoint: "CP2" });
+  expect(await health.json()).toEqual({ status: "ok", mode: "mock", checkpoint: "CP3" });
   await page.goto("/");
   await expect(page.getByText("Prototyp – endast fiktiva patientfall")).toBeVisible();
   await expect(page.getByText("Mock-läge · ingen modellanslutning")).toBeVisible();
